@@ -1,0 +1,291 @@
+// Prisma Schema for Shopify Business Case Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  company       String?
+  role          UserRole       @default(VIEWER)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  lastLogin     DateTime?
+  businessCases BusinessCase[]
+  exports       Export[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+model BusinessCase {
+  id                      String                @id @default(uuid())
+  companyName             String
+  currentRevenue          Float
+  currentPlatform         String
+  industry                String
+  grossMargin             Float                 @default(0.30)
+  discountRate            Float                 @default(0.10)
+  implementationCost      Float                 @default(50000)
+  currentPlatformCost     Float
+  status                  BusinessCaseStatus    @default(DRAFT)
+  tags                    String[]
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+  createdById             String?
+  createdBy               User?                 @relation(fields: [createdById], references: [id])
+  operationalCosts        OperationalCosts?
+  scenarios               Scenario[]
+  risks                   Risk[]
+  implementationTimeline  ImplementationPhase[]
+  exports                 Export[]
+
+  @@map("business_cases")
+}
+
+enum BusinessCaseStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+model OperationalCosts {
+  id                       String       @id @default(uuid())
+  businessCaseId           String       @unique
+  businessCase             BusinessCase @relation(fields: [businessCaseId], references: [id], onDelete: Cascade)
+  revenueLeakage           Float
+  operationalInefficiency  Float
+  integrationMaintenance   Float
+  manualProcessing         Float
+
+  @@map("operational_costs")
+}
+
+model Scenario {
+  id                 String              @id @default(uuid())
+  businessCaseId     String
+  businessCase       BusinessCase        @relation(fields: [businessCaseId], references: [id], onDelete: Cascade)
+  type               ScenarioType
+  year1GrowthRate    Float
+  year2GrowthRate    Float
+  year3GrowthRate    Float
+  paybackPeriod      Float
+  roi3Year           Float
+  npv                Float
+  netBenefit         Float
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  revenueProjections YearlyProjection[]
+  costProjections    YearlyProjection[]  @relation("CostProjections")
+  cashFlowMonthly    MonthlyCashFlow[]
+  assumptions        ScenarioAssumptions?
+
+  @@unique([businessCaseId, type])
+  @@map("scenarios")
+}
+
+enum ScenarioType {
+  CONSERVATIVE
+  MODERATE
+  AGGRESSIVE
+  CUSTOM
+}
+
+model YearlyProjection {
+  id             String   @id @default(uuid())
+  scenarioId     String
+  scenario       Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  costScenarioId String?
+  costScenario   Scenario? @relation("CostProjections", fields: [costScenarioId], references: [id], onDelete: Cascade)
+  year           Int
+  revenue        Float
+  costs          Float
+  grossProfit    Float
+  netCashFlow    Float
+
+  @@unique([scenarioId, year])
+  @@map("yearly_projections")
+}
+
+model MonthlyCashFlow {
+  id            String   @id @default(uuid())
+  scenarioId    String
+  scenario      Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  month         Int
+  investment    Float
+  platformCosts Float
+  returns       Float
+  netCashFlow   Float
+  cumulative    Float
+
+  @@unique([scenarioId, month])
+  @@map("monthly_cash_flow")
+}
+
+model ScenarioAssumptions {
+  id                          String   @id @default(uuid())
+  scenarioId                  String   @unique
+  scenario                    Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  desktopConversionRate       Float
+  mobileConversionRate        Float
+  cartAbandonmentRate         Float
+  cartRecoveryRate            Float
+  averageOrderValue           Float
+  aovGrowthRate               Float
+  repeatPurchaseRate          Float
+  customerLifetimeOrders      Float
+  b2bDigitalPenetration       Float
+  b2bOrderFrequencyIncrease   Float
+
+  @@map("scenario_assumptions")
+}
+
+model ImplementationPhase {
+  id             String       @id @default(uuid())
+  businessCaseId String
+  businessCase   BusinessCase @relation(fields: [businessCaseId], references: [id], onDelete: Cascade)
+  phaseNumber    Int
+  name           String
+  duration       Int // weeks
+  startWeek      Int
+  endWeek        Int
+  description    String
+  deliverables   String[]
+  cost           Float
+  milestones     Milestone[]
+
+  @@unique([businessCaseId, phaseNumber])
+  @@map("implementation_phases")
+}
+
+model Milestone {
+  id                    String              @id @default(uuid())
+  implementationPhaseId String
+  implementationPhase   ImplementationPhase @relation(fields: [implementationPhaseId], references: [id], onDelete: Cascade)
+  name                  String
+  dueDate               DateTime
+  status                MilestoneStatus     @default(PENDING)
+
+  @@map("milestones")
+}
+
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  DELAYED
+}
+
+model Risk {
+  id             String       @id @default(uuid())
+  businessCaseId String
+  businessCase   BusinessCase @relation(fields: [businessCaseId], references: [id], onDelete: Cascade)
+  title          String
+  category       RiskCategory
+  probability    RiskLevel
+  impact         RiskLevel
+  description    String       @db.Text
+  mitigation     String       @db.Text
+  owner          String?
+  status         RiskStatus   @default(IDENTIFIED)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("risks")
+}
+
+enum RiskCategory {
+  TECHNICAL
+  FINANCIAL
+  OPERATIONAL
+  STRATEGIC
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum RiskStatus {
+  IDENTIFIED
+  MITIGATED
+  ACCEPTED
+  RESOLVED
+}
+
+model Export {
+  id             String       @id @default(uuid())
+  businessCaseId String
+  businessCase   BusinessCase @relation(fields: [businessCaseId], references: [id], onDelete: Cascade)
+  userId         String?
+  user           User?        @relation(fields: [userId], references: [id])
+  type           ExportType
+  scenario       ScenarioType?
+  status         ExportStatus @default(PENDING)
+  fileUrl        String?
+  createdAt      DateTime     @default(now())
+  expiresAt      DateTime
+
+  @@map("exports")
+}
+
+enum ExportType {
+  PDF
+  EXCEL
+  JSON
+}
+
+enum ExportStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model Benchmark {
+  id                      String   @id @default(uuid())
+  industry                String
+  revenueRange            String
+  averageConversionRate   Float
+  averageAOV              Float
+  cartAbandonmentRate     Float
+  cartRecoveryRate        Float
+  repeatPurchaseRate      Float
+  averageGrowthRate       Float
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@unique([industry, revenueRange])
+  @@map("benchmarks")
+}
+
+model Template {
+  id                      String   @id @default(uuid())
+  name                    String
+  description             String   @db.Text
+  industry                String
+  useCase                 String
+  defaultRevenue          Float
+  defaultGrossMargin      Float
+  defaultImplementationCost Float
+  configJson              Json
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@map("templates")
+}
