@@ -1,0 +1,19 @@
+{
+  "name": "shopify-bizcase-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "cd app && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build:frontend": "cd app && npm install && npm run build",
+    "build": "npm run build:frontend",
+    "vercel-build": "cd app && npm install && npm run build",
+    "postinstall": "cd backend && npm install && npx prisma generate"
+  },
+  "dependencies": {
+    "@vercel/node": "^3.0.12"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

@@ -101,60 +101,44 @@ shopify-biz-case/
 
 ## 🌐 Deployment
 
-### Deploy Frontend to Vercel
+### ✨ All-in-One Vercel Deployment (Recommended)
 
-1. **Push to GitHub** (see instructions below)
+**Your entire platform now runs on Vercel!** Backend refactored to serverless functions.
 
-2. **Connect to Vercel**:
+#### Quick Deploy (5 minutes):
+
+1. **Push to GitHub**:
+   ```bash
+   git remote add origin https://github.com/YOUR-USERNAME/shopify-biz-case.git
+   git push -u origin main
+   ```
+
+2. **Deploy to Vercel**:
    - Go to [vercel.com](https://vercel.com)
    - Click "Import Project"
-   - Select your GitHub repository
-   - Vercel auto-detects Vite/React
-   - Click "Deploy"
+   - Select your repository
+   - Click "Deploy" (auto-configured!)
 
-3. **Environment Variables** (if using backend):
+3. **Add Vercel Postgres**:
+   - In Vercel project → Storage → Create Database → Postgres
+   - Auto-configures DATABASE_URL ✨
+
+4. **Set Environment Variables**:
    ```
-   VITE_API_URL=https://your-backend-url.railway.app
-   ```
-
-### Deploy Backend to Railway
-
-Railway is recommended for the backend (supports PostgreSQL + Redis):
-
-1. **Create Railway Account**: [railway.app](https://railway.app)
-
-2. **Create New Project**:
-   - Click "New Project"
-   - Select "Deploy from GitHub repo"
-   - Choose your repository
-   - Select `/backend` as root directory
-
-3. **Add Services**:
-   - Add PostgreSQL database
-   - Add Redis
-   - Railway auto-connects them
-
-4. **Environment Variables**:
-   Railway auto-sets `DATABASE_URL` and `REDIS_URL`. Add:
-   ```
+   JWT_SECRET=your-random-secret
+   FRONTEND_URL=https://your-app.vercel.app
    NODE_ENV=production
-   PORT=3001
-   JWT_SECRET=your-production-secret
-   FRONTEND_URL=https://your-vercel-app.vercel.app
    ```
 
-5. **Deploy**: Push to GitHub triggers auto-deployment
+5. **Run Migrations**:
+   ```bash
+   vercel env pull .env.local
+   cd backend && npx prisma migrate deploy
+   ```
 
-### Alternative: Deploy Backend to Render
+✅ **Done!** Your app is live at `https://your-app.vercel.app`
 
-1. Go to [render.com](https://render.com)
-2. Create "New Web Service"
-3. Connect GitHub repository
-4. Root directory: `backend`
-5. Build command: `npm install && npm run build`
-6. Start command: `npm start`
-7. Add PostgreSQL and Redis services
-8. Set environment variables
+See **[VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)** for detailed step-by-step instructions.
 
 ## 📤 Push to GitHub
 
