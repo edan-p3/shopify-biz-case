@@ -24,10 +24,5 @@
       "dest": "/app/dist/index.html"
     }
   ],
-  "env": {
-    "DATABASE_URL": "@database_url",
-    "FRONTEND_URL": "@frontend_url",
-    "JWT_SECRET": "@jwt_secret"
-  },
   "framework": null
 }
