@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
 import { useScenario } from '../../context/ScenarioContext';
 import { formatCurrency } from '../../utils/formatters';
@@ -77,10 +76,10 @@ const FinancialSnapshot: React.FC = () => {
                   <Tooltip 
                     cursor={{ fill: '#334155', opacity: 0.2 }}
                     contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc' }}
-                    formatter={(value: number) => [formatCurrency(value, true), 'Revenue']}
+                    formatter={(value: number | undefined) => [formatCurrency(value || 0, true), 'Revenue']}
                   />
                   <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                    {revenueData.map((entry, index) => (
+                    {revenueData.map((_entry, index) => (
                       <Cell 
                         key={`cell-${index}`} 
                         fill={index === 0 ? '#475569' : '#3b82f6'} // Year 0 is grey, others blue

@@ -62,8 +62,8 @@ const CashFlowAnalysis: React.FC = () => {
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc' }}
                   itemStyle={{ color: '#f8fafc' }}
-                  formatter={(value: number, name: string) => [
-                    formatCurrency(value), 
+                  formatter={(value: number | undefined, name: string) => [
+                    formatCurrency(value || 0), 
                     name === 'net' ? 'Net Monthly Flow' : 'Cumulative Position'
                   ]}
                   labelFormatter={(label) => `Month ${label}`}

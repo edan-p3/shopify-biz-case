@@ -10,7 +10,7 @@ export const RiskAssessment: React.FC = () => {
     <Section id="risks" title="Risk Mitigation Strategy" subtitle="Proactive identification and management of potential migration risks.">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
          <div className="space-y-4">
-           {risks.map((risk) => (
+           {risks.map((risk: any) => (
              <Card key={risk.id} className="group hover:border-slate-500/50 transition-all duration-300">
                <div className="flex items-start justify-between mb-3">
                  <div className="flex items-center gap-3">

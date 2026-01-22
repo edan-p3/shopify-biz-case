@@ -70,7 +70,7 @@ const GrowthProjections: React.FC = () => {
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc' }}
                     itemStyle={{ color: '#f8fafc' }}
-                    formatter={(value: number) => [formatCurrency(value, true), 'Revenue']}
+                    formatter={(value: number | undefined) => [formatCurrency(value || 0, true), 'Revenue']}
                   />
                   <Area 
                     type="monotone" 

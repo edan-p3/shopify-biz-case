@@ -92,3 +92,43 @@ export const BUSINESS_CASE_DATA = {
     ]
   }
 };
+
+// Risk Assessment Data
+export const risks = [
+  {
+    id: '1',
+    title: 'Implementation Delays',
+    category: 'Technical',
+    probability: 'Medium',
+    impact: 'Medium',
+    description: 'Project timeline extends beyond 18 weeks, delaying go-live and expected benefits realization.',
+    mitigation: 'Fixed-price contract with penalty clauses, weekly milestone tracking, dedicated project manager.'
+  },
+  {
+    id: '2',
+    title: 'Revenue Disruption During Migration',
+    category: 'Financial',
+    probability: 'Low',
+    impact: 'High',
+    description: 'Potential revenue loss during platform cutover and stabilization period.',
+    mitigation: 'Phased migration approach, comprehensive testing, backup rollback plan.'
+  },
+  {
+    id: '3',
+    title: 'Team Adoption Challenges',
+    category: 'Operational',
+    probability: 'Medium',
+    impact: 'Medium',
+    description: 'Internal team resistance or slow adoption of new platform and processes.',
+    mitigation: 'Early training program, change management support, dedicated support period.'
+  },
+  {
+    id: '4',
+    title: 'Integration Complexities',
+    category: 'Technical',
+    probability: 'High',
+    impact: 'Medium',
+    description: 'Challenges integrating with existing ERP, CRM, and other critical systems.',
+    mitigation: 'Pre-implementation integration audit, experienced integration partners, buffer time.'
+  }
+];
