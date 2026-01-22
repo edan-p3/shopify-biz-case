@@ -4,7 +4,7 @@ import { useScenario } from '../../context/ScenarioContext';
 import { formatCurrency } from '../../utils/formatters';
 
 export const CurrentState: React.FC = () => {
-  const { inputs, currentScenario } = useScenario();
+  const { inputs } = useScenario();
   
   // Use inputs for dynamic values, fallback to demo data logic if zero
   const costs = inputs.current.platformCosts;

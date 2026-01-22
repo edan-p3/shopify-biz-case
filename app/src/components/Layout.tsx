@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link as ScrollLink } from 'react-scroll';
 import { Menu, X } from 'lucide-react';
-import { Button } from './ui/Button';
 import { InputModal } from './InputModal';
 import { generatePDF } from '../utils/pdfExport';
 

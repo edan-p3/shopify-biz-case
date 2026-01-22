@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, Circle, Clock } from 'lucide-react';
+import { CheckCircle2, Clock } from 'lucide-react';
 import { generatePDF } from '../../utils/pdfExport';
 
 const ImplementationRoadmap: React.FC = () => {

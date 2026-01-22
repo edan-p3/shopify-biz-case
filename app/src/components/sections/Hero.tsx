@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { ArrowRight, TrendingUp, Clock, DollarSign } from 'lucide-react';
 import { Link } from 'react-scroll';
 import { useScenario } from '../../context/ScenarioContext';
-import { formatCurrency } from '../../utils/formatters';
 
 const Hero: React.FC = () => {
   const { currentScenario, inputs } = useScenario();
