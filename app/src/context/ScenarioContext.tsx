@@ -251,11 +251,39 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // ROI
     const roiVal = totalInvestment > 0 ? (netBenefit / totalInvestment) * 100 : 0;
 
-    // Payback Period (Simple approximation)
-    // Monthly Net Benefit = (Annual TCO Savings + Annual GP Gain) / 12
-    const year1NetBenefit = annualTCOSavings + gpGainYear1;
+    // Payback Period (Realistic calculation with ramp-up)
+    // Assume returns start after implementation period and ramp to full by month 2 after launch
+    const year1NetBenefit = annualTCOSavings + gpGainYear1 - futureAnnualTCO;
     const monthlyBenefitY1 = year1NetBenefit / 12;
-    const paybackMonths = monthlyBenefitY1 > 0 ? oneTimeCost / monthlyBenefitY1 : 0;
+    
+    // Factor in implementation period where there are no returns
+    const implementationPeriodMonths = implementationMonths;
+    let cumulativeReturns = 0;
+    let paybackMonths = 0;
+    
+    for (let month = 1; month <= 36; month++) {
+      if (month <= implementationPeriodMonths) {
+        // No returns during implementation
+        continue;
+      } else if (month === implementationPeriodMonths + 1) {
+        // First month after launch: 50% of full monthly benefit (ramp-up)
+        cumulativeReturns += monthlyBenefitY1 * 0.5;
+      } else if (month === implementationPeriodMonths + 2) {
+        // Second month: 75% of full monthly benefit
+        cumulativeReturns += monthlyBenefitY1 * 0.75;
+      } else {
+        // Full monthly benefit thereafter
+        cumulativeReturns += monthlyBenefitY1;
+      }
+      
+      if (cumulativeReturns >= oneTimeCost) {
+        paybackMonths = month;
+        break;
+      }
+    }
+    
+    // If not paid back in 36 months, cap at 36
+    if (paybackMonths === 0) paybackMonths = 36;
 
     // Cash Flow Calculation (Monthly for Year 1)
     // Parse launch timeline to get months
@@ -303,9 +331,16 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       m.cumulative = runningTotal;
     });
 
-    // NPV Calculation (Standard 10% discount rate)
+    // NPV Calculation (Proper multi-year discounting at 10%)
     const discountRate = 0.10;
-    const npv = (netBenefit / Math.pow(1 + discountRate, 3)); // Simplified 3-year NPV for display
+    const year1NetCashFlow = gpGainYear1 + annualTCOSavings - futureAnnualTCO;
+    const year2NetCashFlow = gpGainYear2 + annualTCOSavings - futureAnnualTCO;
+    const year3NetCashFlow = gpGainYear3 + annualTCOSavings - futureAnnualTCO;
+    
+    const npv = -oneTimeCost + 
+                (year1NetCashFlow / Math.pow(1 + discountRate, 1)) +
+                (year2NetCashFlow / Math.pow(1 + discountRate, 2)) +
+                (year3NetCashFlow / Math.pow(1 + discountRate, 3));
 
     return {
       name: selectedScenario,

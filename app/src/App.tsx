@@ -3,12 +3,12 @@ import Hero from './components/sections/Hero';
 import FinancialSnapshot from './components/sections/FinancialSnapshot';
 import { CurrentState } from './components/sections/CurrentState';
 import GrowthProjections from './components/sections/GrowthProjections';
-
 import TCOAnalysis from './components/sections/TCOAnalysis';
 import CashFlowAnalysis from './components/sections/CashFlowAnalysis';
-
 import ImplementationRoadmap from './components/sections/ImplementationRoadmap';
 import { CaseStudies } from './components/sections/CaseStudies';
+import { NextSteps } from './components/sections/NextSteps';
+import { Disclaimer } from './components/sections/Disclaimer';
 
 function App() {
   return (
@@ -21,6 +21,8 @@ function App() {
       <CashFlowAnalysis />
       <ImplementationRoadmap />
       <CaseStudies />
+      <NextSteps />
+      <Disclaimer />
     </Layout>
   );
 }

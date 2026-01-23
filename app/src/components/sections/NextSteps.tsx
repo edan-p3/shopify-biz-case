@@ -2,8 +2,8 @@ import React from 'react';
 import { Section } from '../ui/Section';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { ArrowRight, FileText, Calendar, MessageSquare } from 'lucide-react';
-import { generatePDF } from '../../utils/pdfExport';
+import { ArrowRight, Calendar, MessageSquare } from 'lucide-react';
+import DownloadButtons from '../DownloadButtons';
 
 export const NextSteps: React.FC = () => {
   return (
@@ -19,15 +19,12 @@ export const NextSteps: React.FC = () => {
             Let's move to the next phase.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 no-print">
-            <Button 
-              variant="secondary" 
-              className="h-auto py-4 flex-col gap-2 bg-slate-800/80 hover:bg-slate-700"
-              onClick={generatePDF}
-            >
-              <FileText size={24} className="text-primary" />
-              <span>Download Full Case</span>
-            </Button>
+          {/* Download Buttons with Lead Capture */}
+          <div className="mb-10 no-print">
+            <DownloadButtons />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10 no-print">
             <Button 
               variant="secondary" 
               className="h-auto py-4 flex-col gap-2 bg-slate-800/80 hover:bg-slate-700"

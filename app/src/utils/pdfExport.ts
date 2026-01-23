@@ -18,6 +18,7 @@ export const generatePDF = async () => {
       backgroundColor: '#0F172A', // Match background color
       ignoreElements: (element) => {
         // Ignore elements with class 'no-print'
+        // NOTE: Disclaimer section does NOT have 'no-print' class, so it WILL be included
         return element.classList.contains('no-print');
       },
       onclone: (clonedDoc) => {
