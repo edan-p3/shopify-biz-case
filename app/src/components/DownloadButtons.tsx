@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FileDown, FileText } from 'lucide-react';
-import LeadCaptureModal, { LeadFormData } from './LeadCaptureModal';
+import LeadCaptureModal, { type LeadFormData } from './LeadCaptureModal';
 import { generatePDF } from '../utils/pdfExport';
 
 export default function DownloadButtons() {

@@ -252,6 +252,10 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const roiVal = totalInvestment > 0 ? (netBenefit / totalInvestment) * 100 : 0;
 
     // Payback Period (Realistic calculation with ramp-up)
+    // Parse launch timeline to get implementation months
+    const launchWeeks = parseInt(migration.launchTimeline) || 16;
+    const implementationMonths = Math.ceil(launchWeeks / 4);
+    
     // Assume returns start after implementation period and ramp to full by month 2 after launch
     const year1NetBenefit = annualTCOSavings + gpGainYear1 - futureAnnualTCO;
     const monthlyBenefitY1 = year1NetBenefit / 12;
@@ -286,10 +290,6 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (paybackMonths === 0) paybackMonths = 36;
 
     // Cash Flow Calculation (Monthly for Year 1)
-    // Parse launch timeline to get months
-    const launchWeeks = parseInt(migration.launchTimeline) || 16;
-    const implementationMonths = Math.ceil(launchWeeks / 4);
-
     const monthlyImplementation = oneTimeCost / implementationMonths; 
     const monthlyFutureCost = futureAnnualTCO / 12;
     const monthlyCurrentCost = currentAnnualTCO / 12;
