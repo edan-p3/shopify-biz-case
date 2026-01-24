@@ -60,7 +60,7 @@ class AuthController {
           role: user.role,
         },
         config.jwtSecret,
-        { expiresIn: config.jwtExpiresIn }
+        { expiresIn: config.jwtExpiresIn } as jwt.SignOptions
       );
 
       logger.info('User registered', { userId: user.id, email });
@@ -128,7 +128,7 @@ class AuthController {
           role: user.role,
         },
         config.jwtSecret,
-        { expiresIn: config.jwtExpiresIn }
+        { expiresIn: config.jwtExpiresIn } as jwt.SignOptions
       );
 
       logger.info('User logged in', { userId: user.id, email });

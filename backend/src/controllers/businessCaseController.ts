@@ -207,7 +207,7 @@ class BusinessCaseController {
               );
 
               return {
-                type,
+                type: type as 'CONSERVATIVE' | 'MODERATE' | 'AGGRESSIVE',
                 year1GrowthRate: growthRates[0],
                 year2GrowthRate: growthRates[1],
                 year3GrowthRate: growthRates[2],
@@ -375,12 +375,14 @@ class BusinessCaseController {
           'Implementation roadmap',
         ],
         cost: totalCost * 0.10,
-        milestones: [
-          {
-            name: 'Kickoff meeting completed',
-            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          },
-        ],
+        milestones: {
+          create: [
+            {
+              name: 'Kickoff meeting completed',
+              dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            },
+          ],
+        },
       },
       {
         phaseNumber: 2,
@@ -395,12 +397,14 @@ class BusinessCaseController {
           'Product catalog setup',
         ],
         cost: totalCost * 0.15,
-        milestones: [
-          {
-            name: 'Store setup completed',
-            dueDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
-          },
-        ],
+        milestones: {
+          create: [
+            {
+              name: 'Store setup completed',
+              dueDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
+            },
+          ],
+        },
       },
       {
         phaseNumber: 3,
@@ -415,12 +419,14 @@ class BusinessCaseController {
           'Customer data import',
         ],
         cost: totalCost * 0.25,
-        milestones: [
-          {
-            name: 'Data migration completed',
-            dueDate: new Date(Date.now() + 42 * 24 * 60 * 60 * 1000),
-          },
-        ],
+        milestones: {
+          create: [
+            {
+              name: 'Data migration completed',
+              dueDate: new Date(Date.now() + 42 * 24 * 60 * 60 * 1000),
+            },
+          ],
+        },
       },
       {
         phaseNumber: 4,
@@ -435,12 +441,14 @@ class BusinessCaseController {
           'Third-party app configuration',
         ],
         cost: totalCost * 0.30,
-        milestones: [
-          {
-            name: 'Core integrations live',
-            dueDate: new Date(Date.now() + 70 * 24 * 60 * 60 * 1000),
-          },
-        ],
+        milestones: {
+          create: [
+            {
+              name: 'Core integrations live',
+              dueDate: new Date(Date.now() + 70 * 24 * 60 * 60 * 1000),
+            },
+          ],
+        },
       },
       {
         phaseNumber: 5,
@@ -455,12 +463,14 @@ class BusinessCaseController {
           'User documentation',
         ],
         cost: totalCost * 0.12,
-        milestones: [
-          {
-            name: 'UAT sign-off',
-            dueDate: new Date(Date.now() + 98 * 24 * 60 * 60 * 1000),
-          },
-        ],
+        milestones: {
+          create: [
+            {
+              name: 'UAT sign-off',
+              dueDate: new Date(Date.now() + 98 * 24 * 60 * 60 * 1000),
+            },
+          ],
+        },
       },
       {
         phaseNumber: 6,
@@ -475,12 +485,14 @@ class BusinessCaseController {
           'Optimization recommendations',
         ],
         cost: totalCost * 0.08,
-        milestones: [
-          {
-            name: 'Production go-live',
-            dueDate: new Date(Date.now() + 119 * 24 * 60 * 60 * 1000),
-          },
-        ],
+        milestones: {
+          create: [
+            {
+              name: 'Production go-live',
+              dueDate: new Date(Date.now() + 119 * 24 * 60 * 60 * 1000),
+            },
+          ],
+        },
       },
     ];
 
