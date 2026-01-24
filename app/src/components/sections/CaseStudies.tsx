@@ -3,8 +3,19 @@ import { Section } from '../ui/Section';
 import { Card } from '../ui/Card';
 import { ArrowUpRight } from 'lucide-react';
 import { InfoTooltip } from '../ui/InfoTooltip';
+import { useScenario } from '../../context/ScenarioContext';
 
 export const CaseStudies: React.FC = () => {
+  const { inputs } = useScenario();
+  
+  // Check if user has entered data
+  const hasData = inputs.business.annualRevenue > 0 || inputs.migration.implementationCost > 0;
+  
+  // If no data, don't render this section
+  if (!hasData) {
+    return null;
+  }
+  
   const cases = [
     {
       company: "TechGear Pro",

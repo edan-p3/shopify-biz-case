@@ -213,22 +213,21 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     const annualTCOSavings = currentAnnualTCO - futureAnnualTCO;
 
-    // Growth Rates based on Scenario - Now additive to baseline for realism
-    const baselineGrowth = profile.annualGrowth;
-    
-    const scenarioMultipliers = {
-      conservative: { growth: baselineGrowth + 0.05, label: "+5%" }, // Baseline + 5%
-      moderate: { growth: baselineGrowth + 0.10, label: "+10%" },    // Baseline + 10%
-      aggressive: { growth: baselineGrowth + 0.15, label: "+15%" }   // Baseline + 15%
+    // Growth Rates based on Scenario - Absolute rates per documentation
+    const scenarioRates = {
+      conservative: { year1: 0.15, year2: 0.12, year3: 0.10, label: "Conservative" },
+      moderate: { year1: 0.25, year2: 0.20, year3: 0.15, label: "Moderate" },
+      aggressive: { year1: 0.35, year2: 0.28, year3: 0.20, label: "Aggressive" }
     };
     
-    const targetGrowth = scenarioMultipliers[selectedScenario].growth;
+    const rates = scenarioRates[selectedScenario];
+    const baselineGrowth = profile.annualGrowth;
 
-    // Revenue Projections
+    // Revenue Projections - using documented growth rates
     const year0 = annualRevenue;
-    const year1 = year0 * (1 + targetGrowth);
-    const year2 = year1 * (1 + targetGrowth * 0.9); // Slight deceleration in growth rate itself, but compounding
-    const year3 = year2 * (1 + targetGrowth * 0.9);
+    const year1 = year0 * (1 + rates.year1);
+    const year2 = year1 * (1 + rates.year2);
+    const year3 = year2 * (1 + rates.year3);
 
     const baselineYear1 = year0 * (1 + baselineGrowth);
     const baselineYear2 = baselineYear1 * (1 + baselineGrowth);
@@ -347,7 +346,7 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       paybackPeriod: `${Math.max(0, paybackMonths).toFixed(1)} months`,
       roi3Year: `${roiVal.toFixed(0)}%`,
       year1Revenue: `+${formatCurrency(revenueGainYear1)}`,
-      year1RevenuePercent: `+${((targetGrowth - baselineGrowth) * 100).toFixed(0)}%`, // Show uplift vs baseline
+      year1RevenuePercent: `+${(rates.year1 * 100).toFixed(0)}%`, // Show actual rate
       tcoSavings: formatCurrency(annualTCOSavings),
       npv: formatCurrency(npv),
       revenueProjection: {

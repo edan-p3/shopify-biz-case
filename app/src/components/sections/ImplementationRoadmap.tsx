@@ -1,8 +1,19 @@
 import React from 'react';
 import { CheckCircle2, Clock } from 'lucide-react';
 import { generatePDF } from '../../utils/pdfExport';
+import { useScenario } from '../../context/ScenarioContext';
 
 const ImplementationRoadmap: React.FC = () => {
+  const { inputs } = useScenario();
+  
+  // Check if user has entered data
+  const hasData = inputs.business.annualRevenue > 0 || inputs.migration.implementationCost > 0;
+  
+  // If no data, don't render this section
+  if (!hasData) {
+    return null;
+  }
+  
   const phases = [
     {
       id: 1,
