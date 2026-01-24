@@ -3,10 +3,17 @@ import { useScenario } from '../../context/ScenarioContext';
 import { formatCurrency } from '../../utils/formatters';
 
 const TCOAnalysis: React.FC = () => {
-  const { currentScenario } = useScenario();
+  const { currentScenario, inputs } = useScenario();
   
-  // Hardcoded structure for TCO display based on currentScenario totals
-  // In a real dynamic version, we'd calculate these breakdowns in the context
+  // Check if user has entered data
+  const hasData = inputs.migration.implementationCost > 0 || inputs.migration.shopifyPlan > 0;
+  
+  // If no data, don't render this section
+  if (!hasData) {
+    return null;
+  }
+  
+  // Calculate from actual inputs
   const investment = currentScenario.investmentBreakdown;
   const totalInvestment = investment.total;
   
@@ -15,10 +22,14 @@ const TCOAnalysis: React.FC = () => {
     { category: "Platform & Apps", year1: investment.platformFees / 3, year2: investment.platformFees / 3, year3: investment.platformFees / 3, total: investment.platformFees },
   ];
 
-  // Using savings from context for display
-  const savingsValue = parseFloat(currentScenario.tcoSavings.replace(/[^0-9.-]+/g,""));
-  const projectedCost = 150000; // Placeholder or calculate
-  const legacyCost = projectedCost + savingsValue;
+  // Calculate actual savings from inputs
+  const currentCosts = inputs.current.platformCosts;
+  const currentAnnualTCO = currentCosts.license + currentCosts.hosting + currentCosts.maintenance + currentCosts.integrations + currentCosts.downtimeLoss;
+  const futureAnnualTCO = inputs.migration.shopifyPlan + inputs.migration.apps;
+  const savingsValue = currentAnnualTCO - futureAnnualTCO;
+  
+  const projectedCost = futureAnnualTCO;
+  const legacyCost = currentAnnualTCO;
 
   return (
     <section id="tco" className="py-24 bg-slate-900 relative overflow-hidden border-t border-slate-800">

@@ -6,22 +6,25 @@ import { formatCurrency } from '../../utils/formatters';
 export const CurrentState: React.FC = () => {
   const { inputs } = useScenario();
   
-  // Use inputs for dynamic values, fallback to demo data logic if zero
+  // Use inputs for dynamic values
   const costs = inputs.current.platformCosts;
   const totalLoss = costs.license + costs.maintenance + costs.integrations;
   
-  // If no input data, use the "demo" values from the screenshot for display
-  const displayCosts = totalLoss > 0 ? {
+  // Check if user has entered data
+  const hasData = totalLoss > 0;
+  
+  // Only show actual data when user has entered it
+  const displayCosts = {
     license: costs.license,
     maintenance: costs.maintenance,
     integrations: costs.integrations,
     total: totalLoss
-  } : {
-    license: 300000,
-    maintenance: 150000,
-    integrations: 75000,
-    total: 525000
   };
+  
+  // If no data, don't render this section
+  if (!hasData) {
+    return null;
+  }
 
   return (
     <section id="capabilities" className="py-24 bg-slate-900 relative overflow-hidden border-t border-slate-800">
