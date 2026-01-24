@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileDown, FileText } from 'lucide-react';
+import { FileDown } from 'lucide-react';
 import LeadCaptureModal, { type LeadFormData } from './LeadCaptureModal';
 import { generatePDF } from '../utils/pdfExport';
 
@@ -73,23 +73,14 @@ export default function DownloadButtons() {
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        {/* Download PDF Button */}
+      <div className="flex justify-center">
+        {/* Download PDF Button - Single Centered Button */}
         <button
           onClick={() => handleDownloadClick('pdf')}
           className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
         >
           <FileDown size={24} />
           Download Business Case PDF
-        </button>
-
-        {/* Download Project Plan Button */}
-        <button
-          onClick={() => handleDownloadClick('project-plan')}
-          className="bg-slate-700 hover:bg-slate-600 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
-        >
-          <FileText size={24} />
-          Download Detailed Project Plan
         </button>
       </div>
 
