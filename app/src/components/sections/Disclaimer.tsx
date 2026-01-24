@@ -101,8 +101,8 @@ export const Disclaimer: React.FC = () => {
           </p>
           <p className="text-slate-500 text-xs mt-2">
             For questions or a detailed consultation, contact us at{' '}
-            <a href="mailto:hello@p3media.com" className="text-blue-400 hover:text-blue-300 underline">
-              hello@p3media.com
+            <a href="mailto:contact@pthreemedia.com" className="text-blue-400 hover:text-blue-300 underline">
+              contact@pthreemedia.com
             </a>
           </p>
         </div>
