@@ -7,9 +7,9 @@ import { useScenario } from '../../context/ScenarioContext';
 const Hero: React.FC = () => {
   const { currentScenario, inputs } = useScenario();
   
-  // Check if using demo data or user data
-  const isUsingDemoData = inputs.profile.companyName === 'Your Company';
-  const companyName = isUsingDemoData ? "Your" : inputs.profile.companyName;
+  // Check if user has entered data
+  const hasData = inputs.business.annualRevenue > 0 || inputs.migration.implementationCost > 0;
+  const companyName = inputs.profile.companyName || "Your Business";
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -57,7 +57,15 @@ const Hero: React.FC = () => {
           </motion.h1>
           
           <motion.p variants={itemVariants} className="text-xl text-slate-300 mb-10 leading-relaxed max-w-2xl mx-auto">
-            A strategic investment delivering <span className="font-bold text-white">{currentScenario.roi3Year} ROI</span> in 3 years with a payback period of <span className="font-bold text-white">{currentScenario.paybackPeriod}</span>. Unlock growth, efficiency, and scalability with Shopify.
+            {hasData ? (
+              <>
+                A strategic investment delivering <span className="font-bold text-white">{currentScenario.roi3Year} ROI</span> in 3 years with a payback period of <span className="font-bold text-white">{currentScenario.paybackPeriod}</span>. Unlock growth, efficiency, and scalability with Shopify.
+              </>
+            ) : (
+              <>
+                Calculate your personalized ROI, payback period, and 3-year financial projections. Click <span className="font-bold text-blue-400">"Get Started"</span> to enter your business data and see your custom analysis.
+              </>
+            )}
           </motion.p>
 
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -75,7 +83,8 @@ const Hero: React.FC = () => {
           </motion.div>
         </motion.div>
 
-        {/* Key Metrics Cards */}
+        {/* Key Metrics Cards - Only show if user has data */}
+        {hasData && (
         <motion.div 
           variants={containerVariants}
           initial="hidden"
@@ -130,6 +139,7 @@ const Hero: React.FC = () => {
             <div className="text-slate-400 text-sm font-medium">Payback Period</div>
           </motion.div>
         </motion.div>
+        )}
       </div>
     </section>
   );

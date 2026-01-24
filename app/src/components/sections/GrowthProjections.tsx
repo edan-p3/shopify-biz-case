@@ -6,7 +6,15 @@ import { useScenario } from '../../context/ScenarioContext';
 import { formatCurrency } from '../../utils/formatters';
 
 const GrowthProjections: React.FC = () => {
-  const { currentScenario } = useScenario();
+  const { currentScenario, inputs } = useScenario();
+  
+  // Check if user has entered data
+  const hasData = inputs.business.annualRevenue > 0;
+  
+  // If no data, don't render this section
+  if (!hasData) {
+    return null;
+  }
   
   const data = [
     { year: 'Year 0', value: currentScenario.revenueProjection.year0 * 1000000, baseline: currentScenario.revenueProjection.year0 * 1000000 }, // Baseline Y0 same as Shopify

@@ -12,30 +12,30 @@ interface ScenarioContextType {
 
 const defaultInputs: BusinessInputs = {
   profile: {
-    companyName: 'Your Company',
+    companyName: '',
     businessModel: 'B2C',
     industry: 'Fashion',
     revenueBreakdown: {
-      onlineB2C: 5000000, // $5M demo data
+      onlineB2C: 0,
       onlineB2B: 0,
       retail: 0,
       wholesale: 0
     },
     annualGrowth: 0.05,
     employees: {
-      total: 50,
-      ecommerce: 5,
-      customerService: 3,
-      it: 2
+      total: 0,
+      ecommerce: 0,
+      customerService: 0,
+      it: 0
     }
   },
   current: {
     platformCosts: {
-      license: 35000,      // Demo: $35K annual license
-      hosting: 8000,       // Demo: $8K hosting
-      maintenance: 25000,  // Demo: $25K maintenance
-      integrations: 15000, // Demo: $15K integrations
-      downtimeLoss: 2000   // Demo: $2K downtime
+      license: 0,
+      hosting: 0,
+      maintenance: 0,
+      integrations: 0,
+      downtimeLoss: 0
     },
     metrics: {
       monthlyVisitors: 0,
@@ -87,16 +87,16 @@ const defaultInputs: BusinessInputs = {
     },
     painPoints: [],
     operationalCosts: {
-      manualOrderEntry: 2,         // Demo: 2 hours/week
-      customerQuoteRequests: 3,    // Demo: 3 hours/week
-      customPricing: 2,            // Demo: 2 hours/week
-      inventorySync: 4,            // Demo: 4 hours/week
-      reconciliation: 3,           // Demo: 3 hours/week
-      platformWorkarounds: 2,      // Demo: 2 hours/week
-      manualCSOrders: 2,           // Demo: 2 hours/week
-      manualInterventionPercent: 10,
+      manualOrderEntry: 0,
+      customerQuoteRequests: 0,
+      customPricing: 0,
+      inventorySync: 0,
+      reconciliation: 0,
+      platformWorkarounds: 0,
+      manualCSOrders: 0,
+      manualInterventionPercent: 0,
       manualInterventionTimePerOrder: 0,
-      hourlyRate: 50              // Demo: $50/hour
+      hourlyRate: 0
     },
     integrations: {
         accounting: '',
@@ -106,11 +106,11 @@ const defaultInputs: BusinessInputs = {
     }
   },
   migration: {
-    implementationCost: 100000, // Demo: $100K implementation
-    shopifyPlan: 36000,         // Demo: Shopify Plus $36K/year
-    apps: 12000,                // Demo: $12K/year in apps
+    implementationCost: 0,
+    shopifyPlan: 0,
+    apps: 0,
     training: 0,
-    isTrainingIncluded: true,
+    isTrainingIncluded: false,
     launchTimeline: '16 weeks'
   },
   strategic: {
@@ -120,9 +120,9 @@ const defaultInputs: BusinessInputs = {
     timelineConstraints: ''
   },
   business: {
-    annualRevenue: 5000000, // Demo: $5M
+    annualRevenue: 0,
     annualGrowth: 0.05,
-    grossMargin: 0.35       // Demo: 35% margin
+    grossMargin: 0.40
   }
 };
 

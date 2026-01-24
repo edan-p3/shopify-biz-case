@@ -5,7 +5,15 @@ import { formatCurrency } from '../../utils/formatters';
 import { InfoTooltip } from '../ui/InfoTooltip';
 
 const FinancialSnapshot: React.FC = () => {
-  const { currentScenario, selectedScenario, setScenario } = useScenario();
+  const { currentScenario, selectedScenario, setScenario, inputs } = useScenario();
+  
+  // Check if user has entered data
+  const hasData = inputs.business.annualRevenue > 0 || inputs.migration.implementationCost > 0;
+  
+  // If no data, don't render this section  
+  if (!hasData) {
+    return null;
+  }
 
   // Prepare data for the Revenue Chart
   const revenueData = [

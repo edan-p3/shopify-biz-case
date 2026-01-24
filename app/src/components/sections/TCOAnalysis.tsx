@@ -5,6 +5,14 @@ import { formatCurrency } from '../../utils/formatters';
 const TCOAnalysis: React.FC = () => {
   const { currentScenario, inputs } = useScenario();
   
+  // Check if user has entered data
+  const hasData = inputs.migration.implementationCost > 0 || inputs.migration.shopifyPlan > 0;
+  
+  // If no data, don't render this section
+  if (!hasData) {
+    return null;
+  }
+  
   // Calculate from actual inputs
   const investment = currentScenario.investmentBreakdown;
   const totalInvestment = investment.total;
