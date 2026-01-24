@@ -7,9 +7,11 @@ Due to connection limitations, follow these steps to set up your database:
 1. Open Supabase Dashboard: https://supabase.com/dashboard
 2. Navigate to **SQL Editor** in the left sidebar
 3. Click **New Query**
-4. Copy the entire contents of `backend/prisma/migrations/20260122_init/migration.sql`
+4. Copy the entire contents of `backend/prisma/migrations/20260124_init/migration.sql`
 5. Paste it into the SQL Editor
 6. Click **Run** to execute
+
+**Note**: The migration file is located at: `backend/prisma/migrations/20260124_init/migration.sql`
 
 ## Step 2: Mark Migration as Applied
 
@@ -34,7 +36,7 @@ VALUES (
     gen_random_uuid()::text,
     'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2',
     now(),
-    '20260122_init',
+    '20260124_init',
     NULL,
     1
 );
