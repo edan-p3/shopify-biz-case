@@ -37,13 +37,13 @@ export const CurrentState: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Current Limitations Column */}
+          {/* Current Technical Debt Column */}
           <div>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500">
                 <AlertCircle size={20} />
               </div>
-              <h3 className="text-xl font-bold text-white">Current Limitations</h3>
+              <h3 className="text-xl font-bold text-white">Current Technical Debt</h3>
             </div>
 
             <div className="space-y-4">
