@@ -7,7 +7,9 @@ import { useScenario } from '../../context/ScenarioContext';
 const Hero: React.FC = () => {
   const { currentScenario, inputs } = useScenario();
   
-  const companyName = inputs.profile.companyName || "Your";
+  // Check if using demo data or user data
+  const isUsingDemoData = inputs.profile.companyName === 'Your Company';
+  const companyName = isUsingDemoData ? "Your" : inputs.profile.companyName;
 
   const containerVariants = {
     hidden: { opacity: 0 },
