@@ -19,7 +19,7 @@ function App() {
   useEffect(() => {
     // Check if user has entered any data
     const hasData = 
-      inputs.business.currentRevenue > 0 ||
+      inputs.business.annualRevenue > 0 ||
       inputs.profile.companyName.length > 0;
     
     // If no data and haven't dismissed welcome, show it

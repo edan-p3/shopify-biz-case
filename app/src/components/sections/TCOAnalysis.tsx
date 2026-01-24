@@ -26,7 +26,6 @@ const TCOAnalysis: React.FC = () => {
   const currentCosts = inputs.current.platformCosts;
   const currentAnnualTCO = currentCosts.license + currentCosts.hosting + currentCosts.maintenance + currentCosts.integrations + currentCosts.downtimeLoss;
   const futureAnnualTCO = inputs.migration.shopifyPlan + inputs.migration.apps;
-  const savingsValue = currentAnnualTCO - futureAnnualTCO;
   
   const projectedCost = futureAnnualTCO;
   const legacyCost = currentAnnualTCO;
