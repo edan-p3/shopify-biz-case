@@ -6,15 +6,7 @@ import { useScenario } from '../../context/ScenarioContext';
 import { formatCurrency } from '../../utils/formatters';
 
 const CashFlowAnalysis: React.FC = () => {
-  const { currentScenario, inputs } = useScenario();
-  
-  // Check if user has entered data
-  const hasData = inputs.business.annualRevenue > 0 || inputs.migration.implementationCost > 0;
-  
-  // If no data, don't render this section
-  if (!hasData) {
-    return null;
-  }
+  const { currentScenario } = useScenario();
   
   const monthlyData = currentScenario.cashFlow.map(d => ({
     month: d.month,
