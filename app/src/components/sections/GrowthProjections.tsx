@@ -11,8 +11,11 @@ const GrowthProjections: React.FC = () => {
   // Check if user has entered data
   const hasData = totalRevenue > 0;
   
-  // If no data, don't render this section
-  if (!hasData) {
+  // Hide this section if no revenue growth benefits (cost savings only mode)
+  const hasRevenueGrowth = currentScenario.revenueGrowthBenefit && currentScenario.revenueGrowthBenefit > 0;
+  
+  // If no data or no revenue growth benefits, don't render this section
+  if (!hasData || !hasRevenueGrowth) {
     return null;
   }
   
