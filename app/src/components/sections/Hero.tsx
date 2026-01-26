@@ -5,10 +5,10 @@ import { Link } from 'react-scroll';
 import { useScenario } from '../../context/ScenarioContext';
 
 const Hero: React.FC = () => {
-  const { currentScenario, inputs } = useScenario();
+  const { currentScenario, inputs, includeRevenueGrowth, totalRevenue } = useScenario();
   
   // Check if user has entered data
-  const hasData = inputs.business.annualRevenue > 0 || inputs.migration.implementationCost > 0;
+  const hasData = totalRevenue > 0 || inputs.migration.implementationCost > 0;
   const companyName = inputs.profile.companyName || "Your Business";
 
   const containerVariants = {
@@ -59,7 +59,10 @@ const Hero: React.FC = () => {
           <motion.p variants={itemVariants} className="text-xl text-slate-300 mb-10 leading-relaxed max-w-2xl mx-auto">
             {hasData ? (
               <>
-                A strategic investment delivering <span className="font-bold text-white">{currentScenario.roi3Year} ROI</span> in 3 years with a payback period of <span className="font-bold text-white">{currentScenario.paybackPeriod}</span>. Unlock growth, efficiency, and scalability with Shopify.
+                A strategic investment delivering <span className="font-bold text-white">{currentScenario.roi3Year} ROI</span> in 3 years with a payback period of <span className="font-bold text-white">{currentScenario.paybackPeriod}</span>. 
+                <span className="block mt-2 text-sm text-slate-400">
+                  {includeRevenueGrowth ? '📈 Including growth attribution' : '💰 Cost savings only (conservative)'}
+                </span>
               </>
             ) : (
               <>

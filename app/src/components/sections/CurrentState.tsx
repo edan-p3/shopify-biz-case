@@ -8,16 +8,21 @@ export const CurrentState: React.FC = () => {
   
   // Use inputs for dynamic values
   const costs = inputs.current.platformCosts;
-  const totalLoss = costs.license + costs.maintenance + costs.integrations;
+  const totalLoss = 
+    (costs.license || 0) + 
+    (costs.hosting || 0) + 
+    (costs.maintenance || 0) + 
+    (costs.integrations || 0);
   
   // Check if user has entered data
   const hasData = totalLoss > 0;
   
   // Only show actual data when user has entered it
   const displayCosts = {
-    license: costs.license,
-    maintenance: costs.maintenance,
-    integrations: costs.integrations,
+    license: costs.license || 0,
+    hosting: costs.hosting || 0,
+    maintenance: costs.maintenance || 0,
+    integrations: costs.integrations || 0,
     total: totalLoss
   };
   
@@ -53,6 +58,14 @@ export const CurrentState: React.FC = () => {
                   <div className="text-sm text-slate-500">Annual Impact</div>
                 </div>
                 <div className="text-red-400 font-mono font-bold">-{formatCurrency(displayCosts.license)}</div>
+              </div>
+
+              <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-5 flex justify-between items-center group hover:border-red-500/30 transition-colors">
+                <div>
+                  <div className="text-white font-medium mb-1">Hosting/Infrastructure</div>
+                  <div className="text-sm text-slate-500">Annual Impact</div>
+                </div>
+                <div className="text-red-400 font-mono font-bold">-{formatCurrency(displayCosts.hosting)}</div>
               </div>
 
               <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-5 flex justify-between items-center group hover:border-red-500/30 transition-colors">

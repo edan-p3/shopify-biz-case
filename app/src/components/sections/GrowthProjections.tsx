@@ -6,10 +6,10 @@ import { useScenario } from '../../context/ScenarioContext';
 import { formatCurrency } from '../../utils/formatters';
 
 const GrowthProjections: React.FC = () => {
-  const { currentScenario, inputs } = useScenario();
+  const { currentScenario, inputs, totalRevenue } = useScenario();
   
   // Check if user has entered data
-  const hasData = inputs.business.annualRevenue > 0;
+  const hasData = totalRevenue > 0;
   
   // If no data, don't render this section
   if (!hasData) {

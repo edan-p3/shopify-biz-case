@@ -4,10 +4,10 @@ import { generatePDF } from '../../utils/pdfExport';
 import { useScenario } from '../../context/ScenarioContext';
 
 const ImplementationRoadmap: React.FC = () => {
-  const { inputs } = useScenario();
+  const { inputs, totalRevenue } = useScenario();
   
   // Check if user has entered data
-  const hasData = inputs.business.annualRevenue > 0 || inputs.migration.implementationCost > 0;
+  const hasData = totalRevenue > 0 || inputs.migration.implementationCost > 0;
   
   // If no data, don't render this section
   if (!hasData) {

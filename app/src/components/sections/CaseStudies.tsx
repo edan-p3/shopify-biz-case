@@ -6,10 +6,10 @@ import { InfoTooltip } from '../ui/InfoTooltip';
 import { useScenario } from '../../context/ScenarioContext';
 
 export const CaseStudies: React.FC = () => {
-  const { inputs } = useScenario();
+  const { inputs, totalRevenue } = useScenario();
   
   // Check if user has entered data
-  const hasData = inputs.business.annualRevenue > 0 || inputs.migration.implementationCost > 0;
+  const hasData = totalRevenue > 0 || inputs.migration.implementationCost > 0;
   
   // If no data, don't render this section
   if (!hasData) {

@@ -8,6 +8,9 @@ interface ScenarioContextType {
   currentScenario: Scenario;
   selectedScenario: 'conservative' | 'moderate' | 'aggressive';
   setScenario: (name: string) => void;
+  includeRevenueGrowth: boolean;
+  setIncludeRevenueGrowth: (include: boolean) => void;
+  totalRevenue: number;
 }
 
 const defaultInputs: BusinessInputs = {
@@ -131,6 +134,7 @@ const ScenarioContext = createContext<ScenarioContextType | undefined>(undefined
 export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [inputs, setInputs] = useState<BusinessInputs>(defaultInputs);
   const [selectedScenario, setSelectedScenario] = useState<'conservative' | 'moderate' | 'aggressive'>('moderate');
+  const [includeRevenueGrowth, setIncludeRevenueGrowth] = useState<boolean>(false);
 
   const updateInput = (section: keyof BusinessInputs, field: string, value: any) => {
     setInputs(prev => {
@@ -169,146 +173,147 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   };
 
+  // Calculate total revenue - memoized separately so it can be accessed independently
+  const totalRevenue = useMemo(() => {
+    const totalRevenueFromBreakdown = Object.values(inputs.profile.revenueBreakdown).reduce((a, b) => a + (Number(b) || 0), 0);
+    return totalRevenueFromBreakdown > 0 ? totalRevenueFromBreakdown : inputs.business.annualRevenue;
+  }, [inputs.profile.revenueBreakdown, inputs.business.annualRevenue]);
+
   const calculatedScenario = useMemo(() => {
     const { current, migration, business, profile } = inputs;
     
-    // Calculate Total Revenue from Profile if not set in Business
-    // This fixes the issue where revenue projection is 0 if business.annualRevenue isn't manually set
-    // We prioritize the sum of the breakdown if it's greater than 0
-    const totalRevenueFromBreakdown = Object.values(profile.revenueBreakdown).reduce((a, b) => a + (Number(b) || 0), 0);
-    const annualRevenue = totalRevenueFromBreakdown > 0 ? totalRevenueFromBreakdown : business.annualRevenue;
+    // Use the calculated total revenue
+    const annualRevenue = totalRevenue;
 
-    // Map new structure to calculation variables
+    // **PLATFORM COSTS CALCULATION**
     const currentCosts = current.platformCosts;
-    const opsCosts = current.operationalCosts;
     
-    // Calculate Annual Operational Inefficiencies
-    const weeklyOpsHours = 
-      opsCosts.manualOrderEntry + 
-      opsCosts.customerQuoteRequests + 
-      opsCosts.customPricing +
-      opsCosts.inventorySync + 
-      opsCosts.reconciliation +
-      opsCosts.platformWorkarounds + 
-      opsCosts.manualCSOrders;
-      
-    // Include B2B manual processing if applicable
-    const b2bOpsHours = current.b2b?.manualProcessingHours || 0;
-    
-    const annualOpsInefficiencyCost = (weeklyOpsHours + b2bOpsHours) * opsCosts.hourlyRate * 52;
-    
-    // Costs
+    // Current Annual Platform Costs (what they're paying now)
     const currentAnnualTCO = 
-      currentCosts.license + 
-      currentCosts.hosting + 
-      currentCosts.maintenance + 
-      currentCosts.integrations + 
-      currentCosts.downtimeLoss + 
-      annualOpsInefficiencyCost; // Now including labor costs
+      (currentCosts.license || 0) + 
+      (currentCosts.hosting || 0) + 
+      (currentCosts.maintenance || 0) + 
+      (currentCosts.integrations || 0);
       
-    const futureAnnualTCO = migration.shopifyPlan + migration.apps; // Annual inputs are already annual
+    // Future Annual Platform Costs (Shopify)
+    const futureAnnualTCO = (migration.shopifyPlan || 0) + (migration.apps || 0);
     
-    // One-time cost logic: if training is included, don't add it separately
+    // One-time implementation cost
     const oneTimeCost = migration.implementationCost + (migration.isTrainingIncluded ? 0 : migration.training);
     
-    const annualTCOSavings = currentAnnualTCO - futureAnnualTCO;
+    // Annual Cost Savings = Current - Future
+    const annualCostSavings = currentAnnualTCO - futureAnnualTCO;
 
-    // Growth Rates based on Scenario - Absolute rates per documentation
+    // Growth Rates based on Scenario (for revenue attribution if enabled)
     const scenarioRates = {
-      conservative: { year1: 0.15, year2: 0.12, year3: 0.10, label: "Conservative" },
-      moderate: { year1: 0.25, year2: 0.20, year3: 0.15, label: "Moderate" },
-      aggressive: { year1: 0.35, year2: 0.28, year3: 0.20, label: "Aggressive" }
+      conservative: { 
+        year1: 0.10, year2: 0.08, year3: 0.07, 
+        label: "Conservative",
+        description: "10% incremental growth attributed to platform capabilities"
+      },
+      moderate: { 
+        year1: 0.15, year2: 0.12, year3: 0.10, 
+        label: "Moderate",
+        description: "15% incremental growth from enhanced conversion & mobile experience"
+      },
+      aggressive: { 
+        year1: 0.20, year2: 0.17, year3: 0.15, 
+        label: "Aggressive",
+        description: "20% growth from full omnichannel capabilities & optimization"
+      }
     };
     
     const rates = scenarioRates[selectedScenario];
     const baselineGrowth = profile.annualGrowth;
 
-    // Revenue Projections - using documented growth rates
+    // Revenue Projections
     const year0 = annualRevenue;
-    const year1 = year0 * (1 + rates.year1);
-    const year2 = year1 * (1 + rates.year2);
-    const year3 = year2 * (1 + rates.year3);
+    
+    // Calculate with and without platform impact
+    let year1, year2, year3;
+    let revenueGainYear1 = 0, revenueGainYear2 = 0, revenueGainYear3 = 0;
+    let gpGainYear1 = 0, gpGainYear2 = 0, gpGainYear3 = 0;
+    
+    if (includeRevenueGrowth && annualRevenue > 0) {
+      // WITH REVENUE ATTRIBUTION
+      year1 = year0 * (1 + baselineGrowth + rates.year1);
+      year2 = year1 * (1 + baselineGrowth + rates.year2);
+      year3 = year2 * (1 + baselineGrowth + rates.year3);
+      
+      const baselineYear1 = year0 * (1 + baselineGrowth);
+      const baselineYear2 = baselineYear1 * (1 + baselineGrowth);
+      const baselineYear3 = baselineYear2 * (1 + baselineGrowth);
+      
+      revenueGainYear1 = year1 - baselineYear1;
+      revenueGainYear2 = year2 - baselineYear2;
+      revenueGainYear3 = year3 - baselineYear3;
+      
+      gpGainYear1 = revenueGainYear1 * business.grossMargin;
+      gpGainYear2 = revenueGainYear2 * business.grossMargin;
+      gpGainYear3 = revenueGainYear3 * business.grossMargin;
+    } else {
+      // WITHOUT REVENUE ATTRIBUTION (baseline only)
+      year1 = year0 * (1 + baselineGrowth);
+      year2 = year1 * (1 + baselineGrowth);
+      year3 = year2 * (1 + baselineGrowth);
+    }
 
-    const baselineYear1 = year0 * (1 + baselineGrowth);
-    const baselineYear2 = baselineYear1 * (1 + baselineGrowth);
-    const baselineYear3 = baselineYear2 * (1 + baselineGrowth);
-
-    const revenueGainYear1 = year1 - baselineYear1;
-    const revenueGainYear2 = year2 - baselineYear2;
-    const revenueGainYear3 = year3 - baselineYear3;
-    // Gross Profit Impact
-    const gpGainYear1 = revenueGainYear1 * business.grossMargin;
-    const gpGainYear2 = revenueGainYear2 * business.grossMargin;
-    const gpGainYear3 = revenueGainYear3 * business.grossMargin;
-    const totalGPGain = gpGainYear1 + gpGainYear2 + gpGainYear3;
-
+    // Total Annual Benefit
+    const annualBenefitYear1 = annualCostSavings + gpGainYear1;
+    const annualBenefitYear2 = annualCostSavings + gpGainYear2;
+    const annualBenefitYear3 = annualCostSavings + gpGainYear3;
+    
     // 3-Year Totals
     const totalInvestment = oneTimeCost + (futureAnnualTCO * 3);
-    const totalSavings = annualTCOSavings * 3;
-    const netBenefit = totalGPGain + totalSavings - totalInvestment;
+    const totalCostSavings = annualCostSavings * 3;
+    const totalGrossProfitGain = gpGainYear1 + gpGainYear2 + gpGainYear3;
+    const totalBenefit = totalCostSavings + totalGrossProfitGain;
+    const netBenefit = totalBenefit - totalInvestment;
     
     // ROI
     const roiVal = totalInvestment > 0 ? (netBenefit / totalInvestment) * 100 : 0;
 
-    // Payback Period (Realistic calculation with ramp-up)
-    // Parse launch timeline to get implementation months
+    // Payback Period
     const launchWeeks = parseInt(migration.launchTimeline) || 16;
     const implementationMonths = Math.ceil(launchWeeks / 4);
+    const monthlyBenefitYear1 = annualBenefitYear1 / 12;
+    const monthlyFutureCost = futureAnnualTCO / 12;
+    const monthlyImplementation = oneTimeCost / implementationMonths;
     
-    // Assume returns start after implementation period and ramp to full by month 2 after launch
-    const year1NetBenefit = annualTCOSavings + gpGainYear1 - futureAnnualTCO;
-    const monthlyBenefitY1 = year1NetBenefit / 12;
-    
-    // Factor in implementation period where there are no returns
-    const implementationPeriodMonths = implementationMonths;
-    let cumulativeReturns = 0;
+    let cumulativeCashFlow = 0;
     let paybackMonths = 0;
     
     for (let month = 1; month <= 36; month++) {
-      if (month <= implementationPeriodMonths) {
-        // No returns during implementation
-        continue;
-      } else if (month === implementationPeriodMonths + 1) {
-        // First month after launch: 50% of full monthly benefit (ramp-up)
-        cumulativeReturns += monthlyBenefitY1 * 0.5;
-      } else if (month === implementationPeriodMonths + 2) {
-        // Second month: 75% of full monthly benefit
-        cumulativeReturns += monthlyBenefitY1 * 0.75;
-      } else {
-        // Full monthly benefit thereafter
-        cumulativeReturns += monthlyBenefitY1;
-      }
+      const investment = month <= implementationMonths ? monthlyImplementation : 0;
+      const savings = currentAnnualTCO / 12; // What we were paying
+      const platformCost = monthlyFutureCost; // What we pay now
+      const revenueGain = includeRevenueGrowth ? (month <= 12 ? gpGainYear1 / 12 : 0) : 0; // Simplified
       
-      if (cumulativeReturns >= oneTimeCost) {
+      const netCashFlow = savings + revenueGain - investment - platformCost;
+      cumulativeCashFlow += netCashFlow;
+      
+      if (cumulativeCashFlow >= 0 && paybackMonths === 0) {
         paybackMonths = month;
         break;
       }
     }
     
-    // If not paid back in 36 months, cap at 36
     if (paybackMonths === 0) paybackMonths = 36;
 
     // Cash Flow Calculation (Monthly for Year 1)
-    const monthlyImplementation = oneTimeCost / implementationMonths; 
-    const monthlyFutureCost = futureAnnualTCO / 12;
     const monthlyCurrentCost = currentAnnualTCO / 12;
-    
-    // Recalculate monthly revenue gain based on inputs if needed, or keep high level projection
-    const monthlyRevenueGain = revenueGainYear1 / 12;
-    const monthlyGPGain = monthlyRevenueGain * business.grossMargin;
-    const monthlySavings = monthlyCurrentCost - monthlyFutureCost; // Savings kick in after go-live
+    const monthlyRevenueGain = includeRevenueGrowth ? gpGainYear1 / 12 : 0;
 
     const cashFlow = Array.from({ length: 12 }, (_, i) => {
       const month = i + 1;
       const isImplementation = month <= implementationMonths;
-      const isLive = month > implementationMonths;
 
       // Outflows
       const investment = isImplementation ? monthlyImplementation : 0;
-      const platformCosts = monthlyFutureCost; // Assuming we pay this from start or after go-live? Usually from start if signed.
+      const platformCosts = monthlyFutureCost;
 
       // Inflows
-      const returns = isLive ? (monthlyGPGain + monthlySavings) : 0;
+      const returns = monthlyCurrentCost + monthlyRevenueGain;
 
       // Net
       const netCashFlow = returns - (investment + platformCosts);
@@ -330,24 +335,23 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       m.cumulative = runningTotal;
     });
 
-    // NPV Calculation (Proper multi-year discounting at 10%)
+    // NPV Calculation
     const discountRate = 0.10;
-    const year1NetCashFlow = gpGainYear1 + annualTCOSavings - futureAnnualTCO;
-    const year2NetCashFlow = gpGainYear2 + annualTCOSavings - futureAnnualTCO;
-    const year3NetCashFlow = gpGainYear3 + annualTCOSavings - futureAnnualTCO;
     
     const npv = -oneTimeCost + 
-                (year1NetCashFlow / Math.pow(1 + discountRate, 1)) +
-                (year2NetCashFlow / Math.pow(1 + discountRate, 2)) +
-                (year3NetCashFlow / Math.pow(1 + discountRate, 3));
+                (annualBenefitYear1 / Math.pow(1 + discountRate, 1)) +
+                (annualBenefitYear2 / Math.pow(1 + discountRate, 2)) +
+                (annualBenefitYear3 / Math.pow(1 + discountRate, 3));
 
     return {
       name: selectedScenario,
       paybackPeriod: `${Math.max(0, paybackMonths).toFixed(1)} months`,
-      roi3Year: `${roiVal.toFixed(0)}%`,
-      year1Revenue: `+${formatCurrency(revenueGainYear1)}`,
-      year1RevenuePercent: `+${(rates.year1 * 100).toFixed(0)}%`, // Show actual rate
-      tcoSavings: formatCurrency(annualTCOSavings),
+      roi3Year: `${roiVal.toFixed(1)}%`,
+      year1Revenue: formatCurrency(year1),
+      year1RevenuePercent: includeRevenueGrowth 
+        ? `+${((rates.year1 + baselineGrowth) * 100).toFixed(0)}%`
+        : `+${(baselineGrowth * 100).toFixed(0)}%`,
+      tcoSavings: formatCurrency(annualCostSavings),
       npv: formatCurrency(npv),
       revenueProjection: {
         year0: year0 / 1000000,
@@ -356,21 +360,26 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         year3: year3 / 1000000
       },
       grossProfitImpact: {
-        year1: gpGainYear1,
-        year2: gpGainYear2,
-        year3: gpGainYear3,
-        total: totalGPGain
+        year1: annualBenefitYear1,
+        year2: annualBenefitYear2,
+        year3: annualBenefitYear3,
+        total: totalBenefit
       },
       netBenefit: formatCurrency(netBenefit),
-      roiPercent: `${roiVal.toFixed(0)}%`,
+      roiPercent: `${roiVal.toFixed(1)}%`,
       cashFlow,
       investmentBreakdown: {
         implementation: oneTimeCost,
         platformFees: futureAnnualTCO * 3,
         total: totalInvestment
-      }
+      },
+      // Additional metadata for display
+      includesRevenueGrowth: includeRevenueGrowth,
+      costSavingsOnly: annualCostSavings * 3,
+      revenueGrowthBenefit: totalGrossProfitGain,
+      scenarioDescription: includeRevenueGrowth ? rates.description : "Cost savings only"
     };
-  }, [inputs, selectedScenario]);
+  }, [inputs, selectedScenario, includeRevenueGrowth, totalRevenue]);
 
   const setScenario = (name: string) => {
     if (['conservative', 'moderate', 'aggressive'].includes(name)) {
@@ -384,7 +393,10 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       updateInput, 
       currentScenario: calculatedScenario, 
       selectedScenario, 
-      setScenario 
+      setScenario,
+      includeRevenueGrowth,
+      setIncludeRevenueGrowth,
+      totalRevenue
     }}>
       {children}
     </ScenarioContext.Provider>

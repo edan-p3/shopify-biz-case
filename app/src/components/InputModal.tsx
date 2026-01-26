@@ -5,6 +5,7 @@ import { InfoTooltip } from './ui/InfoTooltip';
 import { useScenario } from '../context/ScenarioContext';
 import { Settings, X, ArrowRight, ArrowLeft, CheckCircle2, Building2, BarChart3, ShoppingBag, Truck, Target } from 'lucide-react';
 import { clsx } from 'clsx';
+import { FormattedNumberInput, formatNumberWithCommas } from './FormattedNumberInput';
 
 // Helper to safely get nested values
 function getNestedValue(obj: any, path: string) {
@@ -75,16 +76,13 @@ function getNestedValue(obj: any, path: string) {
         ].map(({ key, label }) => (
           <div key={key}>
             <label className="block text-xs text-slate-400 mb-1.5">{label}</label>
-            <div className="relative">
-              <span className="absolute left-3 top-2.5 text-slate-500">$</span>
-              <input
-                type="number"
-                value={getNestedValue(inputs.profile, key.split('.')[1]) === 0 ? '' : getNestedValue(inputs.profile, key.split('.')[1])}
-                onChange={(e) => updateInput('profile', key, Number(e.target.value))}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 pl-7 pr-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                placeholder="0"
-              />
-            </div>
+            <FormattedNumberInput
+              value={getNestedValue(inputs.profile, key.split('.')[1]) || 0}
+              onChange={(val) => updateInput('profile', key, val)}
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 pl-7 pr-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              placeholder="0"
+              prefix="$"
+            />
           </div>
         ))}
       </div>
@@ -100,24 +98,22 @@ function getNestedValue(obj: any, path: string) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
          <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Current Growth Rate (%)</label>
-            <div className="relative">
-              <input
-                type="number"
-                step="0.1"
-                value={(inputs.profile.annualGrowth * 100).toFixed(1)}
-                onChange={(e) => updateInput('profile', 'annualGrowth', Number(e.target.value) / 100)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 px-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-              />
-              <span className="absolute right-3 top-2.5 text-slate-500">%</span>
-            </div>
+            <FormattedNumberInput
+              value={(inputs.profile.annualGrowth * 100) || 0}
+              onChange={(val) => updateInput('profile', 'annualGrowth', val / 100)}
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 px-3 pr-8 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              placeholder="0"
+              suffix="%"
+              step="0.1"
+            />
          </div>
          <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Total Employees</label>
-            <input
-              type="number"
-              value={inputs.profile.employees.total}
-              onChange={(e) => updateInput('profile', 'employees.total', Number(e.target.value))}
+            <FormattedNumberInput
+              value={inputs.profile.employees.total || 0}
+              onChange={(val) => updateInput('profile', 'employees.total', val)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 px-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              placeholder="0"
             />
          </div>
       </div>
@@ -125,16 +121,14 @@ function getNestedValue(obj: any, path: string) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
          <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Gross Margin (%)</label>
-            <div className="relative">
-              <input
-                type="number"
-                step="0.1"
-                value={(inputs.business.grossMargin * 100).toFixed(1)}
-                onChange={(e) => updateInput('business', 'grossMargin', Number(e.target.value) / 100)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 px-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-              />
-              <span className="absolute right-3 top-2.5 text-slate-500">%</span>
-            </div>
+            <FormattedNumberInput
+              value={(inputs.business.grossMargin * 100) || 0}
+              onChange={(val) => updateInput('business', 'grossMargin', val / 100)}
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 px-3 pr-8 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              placeholder="0"
+              suffix="%"
+              step="0.1"
+            />
             <p className="text-xs text-slate-500 mt-1">Used to calculate Gross Profit impact.</p>
          </div>
       </div>
@@ -184,16 +178,13 @@ const StepCurrentState = ({ inputs, updateInput }: any) => {
           ].map(({ key, label }) => (
             <div key={key}>
               <label className="block text-xs text-slate-400 mb-1.5">{label}</label>
-              <div className="relative">
-                <span className="absolute left-3 top-2 text-slate-500">$</span>
-                <input
-                  type="number"
-                  value={getNestedValue(inputs.current, key) === 0 ? '' : getNestedValue(inputs.current, key)}
-                  onChange={(e) => updateInput('current', key, Number(e.target.value))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg py-1.5 pl-6 pr-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                  placeholder="0"
-                />
-              </div>
+              <FormattedNumberInput
+                value={getNestedValue(inputs.current, key) || 0}
+                onChange={(val) => updateInput('current', key, val)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg py-1.5 pl-6 pr-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                placeholder="0"
+                prefix="$"
+              />
             </div>
           ))}
         </div>
@@ -225,21 +216,19 @@ const StepCurrentState = ({ inputs, updateInput }: any) => {
                   <label className="block text-xs text-slate-400">{label}</label>
                 )}
               </div>
-              <div className="relative">
-                {icon === '$' && <span className="absolute left-2 top-2 text-slate-500 text-xs">$</span>}
-                <input
-                  type="number"
-                  step={key.includes('Rate') || key.includes('PerCustomer') ? '0.01' : '1'}
-                  value={getNestedValue(inputs.current, key) === 0 ? '' : getNestedValue(inputs.current, key)}
-                  onChange={(e) => updateInput('current', key, Number(e.target.value))}
-                  className={clsx(
-                    "w-full bg-slate-900 border border-slate-700 rounded-lg py-1.5 px-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    icon === '$' ? 'pl-5' : ''
-                  )}
-                  placeholder="0"
-                />
-                {icon === '%' && <span className="absolute right-3 top-2 text-slate-500 text-xs">%</span>}
-              </div>
+              <FormattedNumberInput
+                value={getNestedValue(inputs.current, key) || 0}
+                onChange={(val) => updateInput('current', key, val)}
+                className={clsx(
+                  "w-full bg-slate-900 border border-slate-700 rounded-lg py-1.5 px-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+                  icon === '$' ? 'pl-5' : '',
+                  icon === '%' ? 'pr-6' : ''
+                )}
+                placeholder="0"
+                prefix={icon === '$' ? '$' : ''}
+                suffix={icon === '%' ? '%' : ''}
+                step={key.includes('Rate') || key.includes('PerCustomer') ? '0.01' : '1'}
+              />
              </div>
           ))}
         </div>
@@ -261,10 +250,9 @@ const StepCurrentState = ({ inputs, updateInput }: any) => {
           ].map(({ key, label }) => (
             <div key={key} className="flex justify-between items-center bg-slate-800/30 p-2 rounded border border-slate-700/30">
                <label className="text-xs text-slate-300">{label}</label>
-               <input
-                  type="number"
-                  value={getNestedValue(inputs.current, key) === 0 ? '' : getNestedValue(inputs.current, key)}
-                  onChange={(e) => updateInput('current', key, Number(e.target.value))}
+               <FormattedNumberInput
+                  value={getNestedValue(inputs.current, key) || 0}
+                  onChange={(val) => updateInput('current', key, val)}
                   className="w-16 bg-slate-900 border border-slate-700 rounded py-1 px-2 text-right text-xs text-white focus:outline-none focus:border-primary"
                   placeholder="0"
                />
@@ -273,10 +261,9 @@ const StepCurrentState = ({ inputs, updateInput }: any) => {
         </div>
         <div className="mt-4 flex justify-end items-center gap-3">
            <label className="text-xs text-slate-400">Avg Hourly Staff Rate ($)</label>
-           <input
-              type="number"
-              value={inputs.current.operationalCosts.hourlyRate === 0 ? '' : inputs.current.operationalCosts.hourlyRate}
-              onChange={(e) => updateInput('current', 'operationalCosts.hourlyRate', Number(e.target.value))}
+           <FormattedNumberInput
+              value={inputs.current.operationalCosts.hourlyRate || 0}
+              onChange={(val) => updateInput('current', 'operationalCosts.hourlyRate', val)}
               className="w-20 bg-slate-900 border border-slate-700 rounded py-1 px-2 text-right text-sm text-white focus:outline-none focus:border-primary"
               placeholder="0"
             />
@@ -351,20 +338,20 @@ const StepBusinessSpecifics = ({ inputs, updateInput }: any) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
              <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">Wholesale Customer Count</label>
-                <input
-                  type="number"
-                  value={inputs.current.b2b.wholesaleCustomers}
-                  onChange={(e) => updateInput('current', 'b2b.wholesaleCustomers', Number(e.target.value))}
+                <FormattedNumberInput
+                  value={inputs.current.b2b.wholesaleCustomers || 0}
+                  onChange={(val) => updateInput('current', 'b2b.wholesaleCustomers', val)}
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 px-3 text-white focus:outline-none focus:border-primary"
+                  placeholder="0"
                 />
              </div>
              <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">Manual Processing (Hrs/Week)</label>
-                <input
-                  type="number"
-                  value={inputs.current.b2b.manualProcessingHours}
-                  onChange={(e) => updateInput('current', 'b2b.manualProcessingHours', Number(e.target.value))}
+                <FormattedNumberInput
+                  value={inputs.current.b2b.manualProcessingHours || 0}
+                  onChange={(val) => updateInput('current', 'b2b.manualProcessingHours', val)}
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 px-3 text-white focus:outline-none focus:border-primary"
+                  placeholder="0"
                 />
                 <p className="text-xs text-slate-500 mt-1">Time spent on manual entry, pricing, etc.</p>
              </div>
@@ -397,11 +384,11 @@ const StepBusinessSpecifics = ({ inputs, updateInput }: any) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
              <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">Number of Locations</label>
-                <input
-                  type="number"
-                  value={inputs.current.retail.locationCount}
-                  onChange={(e) => updateInput('current', 'retail.locationCount', Number(e.target.value))}
+                <FormattedNumberInput
+                  value={inputs.current.retail.locationCount || 0}
+                  onChange={(val) => updateInput('current', 'retail.locationCount', val)}
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 px-3 text-white focus:outline-none focus:border-primary"
+                  placeholder="0"
                 />
              </div>
              <div>
@@ -443,31 +430,26 @@ const StepMigrationFuture = ({ inputs, updateInput }: any) => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <label className="block text-sm font-medium text-slate-300 mb-2">Est. Implementation Cost</label>
-        <div className="relative">
-          <span className="absolute left-3 top-2.5 text-slate-500">$</span>
-          <input
-            type="number"
-            value={inputs.migration.implementationCost}
-            onChange={(e) => updateInput('migration', 'implementationCost', Number(e.target.value))}
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-7 pr-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-          />
-        </div>
+        <FormattedNumberInput
+          value={inputs.migration.implementationCost || 0}
+          onChange={(val) => updateInput('migration', 'implementationCost', val)}
+          className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-7 pr-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+          placeholder="0"
+          prefix="$"
+        />
       </div>
       <div>
         <label className="block text-sm font-medium text-slate-300 mb-2">Training Budget</label>
-        <div className="relative">
-          <span className="absolute left-3 top-2.5 text-slate-500">$</span>
-          <input
-            type="number"
-            value={inputs.migration.training}
-            onChange={(e) => updateInput('migration', 'training', Number(e.target.value))}
-            className={clsx(
-              "w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-7 pr-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-              inputs.migration.isTrainingIncluded && "opacity-50 cursor-not-allowed"
-            )}
-            disabled={inputs.migration.isTrainingIncluded}
-          />
-        </div>
+        <FormattedNumberInput
+          value={inputs.migration.training || 0}
+          onChange={(val) => updateInput('migration', 'training', val)}
+          className={clsx(
+            "w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-7 pr-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+            inputs.migration.isTrainingIncluded && "opacity-50 cursor-not-allowed"
+          )}
+          placeholder="0"
+          prefix="$"
+        />
         <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
           <input
             type="checkbox"
@@ -485,27 +467,23 @@ const StepMigrationFuture = ({ inputs, updateInput }: any) => (
        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Shopify Plus Plan (Annual)</label>
-            <div className="relative">
-              <span className="absolute left-3 top-2.5 text-slate-500">$</span>
-              <input
-                type="number"
-                value={inputs.migration.shopifyPlan}
-                onChange={(e) => updateInput('migration', 'shopifyPlan', Number(e.target.value))}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-7 pr-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-              />
-            </div>
+            <FormattedNumberInput
+              value={inputs.migration.shopifyPlan || 0}
+              onChange={(val) => updateInput('migration', 'shopifyPlan', val)}
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-7 pr-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              placeholder="0"
+              prefix="$"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Apps & Integrations (Annual)</label>
-            <div className="relative">
-              <span className="absolute left-3 top-2.5 text-slate-500">$</span>
-              <input
-                type="number"
-                value={inputs.migration.apps}
-                onChange={(e) => updateInput('migration', 'apps', Number(e.target.value))}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-7 pr-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-              />
-            </div>
+            <FormattedNumberInput
+              value={inputs.migration.apps || 0}
+              onChange={(val) => updateInput('migration', 'apps', val)}
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-7 pr-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              placeholder="0"
+              prefix="$"
+            />
           </div>
        </div>
     </div>

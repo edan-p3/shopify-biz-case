@@ -13,13 +13,13 @@ import { Disclaimer } from './components/sections/Disclaimer';
 import { useScenario } from './context/ScenarioContext';
 
 function App() {
-  const { inputs } = useScenario();
+  const { inputs, totalRevenue } = useScenario();
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     // Check if user has entered any data
     const hasData = 
-      inputs.business.annualRevenue > 0 ||
+      totalRevenue > 0 ||
       inputs.profile.companyName.length > 0;
     
     // If no data and haven't dismissed welcome, show it

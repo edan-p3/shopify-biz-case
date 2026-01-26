@@ -1,94 +1,95 @@
 export const BUSINESS_CASE_DATA = {
   summary: {
-    roi3Year: 4815, // 4,815%
-    paybackPeriodMonths: 0.5, // "0.5 months" velocity metric
-    paybackPeriodLabel: "Post-Launch Payback",
-    breakevenMonth: 5, // "Month 5" calendar metric
-    npv3Year: 24597295, // $24,597,295
+    roi3Year: 9.27, // 9.27% - REALISTIC cost savings ROI
+    paybackPeriodMonths: 11, // 11 months - REALISTIC payback
+    paybackPeriodLabel: "Payback Period",
+    breakevenMonth: 11, // Month 11 - breakeven point
+    npv3Year: -71116, // -$71,116 - Slightly negative NPV at 10% discount (realistic for cost-savings only)
     initialInvestment: 230000, // Implementation
-    total3YearInvestment: 680000, // $680k
+    total3YearInvestment: 755000, // $755k (Implementation + 3 years platform costs)
   },
   scenarios: {
     conservative: {
       label: "Conservative",
-      revenueUpliftYear1: 10000000, // Assumption for conservative
-      roi: 2400,
-      npv: 12000000,
+      revenueUpliftYear1: 0, // Not attributing revenue growth to platform
+      roi: 7.5, // Conservative scenario: lower savings
+      npv: -100000, // Negative NPV in conservative case
     },
     moderate: {
       label: "Moderate",
-      revenueUpliftYear1: 20000000, // +$20M (Confirmed)
-      roi: 4815, // Confirmed
-      npv: 24597295, // Confirmed
+      revenueUpliftYear1: 0, // Not attributing revenue growth to platform
+      roi: 9.27, // Based on actual cost savings
+      npv: -71116, // Realistic NPV
     },
     aggressive: {
       label: "Aggressive",
-      revenueUpliftYear1: 30000000, // Assumption
-      roi: 7200,
-      npv: 36000000,
+      revenueUpliftYear1: 0, // Not attributing revenue growth to platform  
+      roi: 12.0, // Aggressive: assumes additional efficiency gains
+      npv: -40000, // Better NPV with additional savings
     }
   },
   revenueProjection: {
     baseline: {
-      year0: 200000000, // Inferring baseline from +10% = $20M uplift. $20M is 10% of $200M.
+      year0: 200000000, // Current revenue
       year1: 210000000, // 5% organic growth
       year2: 220500000,
       year3: 231525000,
     },
     shopify: {
       year0: 200000000,
-      year1: 230000000, // Baseline + $20M uplift
-      year2: 252000000, // Acceleration
-      year3: 280000000,
+      year1: 210000000, // Same growth (not attributing revenue to platform migration)
+      year2: 220500000,
+      year3: 231525000,
     }
   },
   grossProfitImpact: {
-    year1: 5000000,
-    year2: 10300000,
-    year3: 16994000,
-    total: 32294000
+    year1: 275000, // Annual cost savings
+    year2: 275000,
+    year3: 275000,
+    total: 825000  // 3-year total savings
   },
   investment: {
     implementation: 230000,
-    platformFeesAnnual: 150000,
-    total3Year: 680000,
+    platformFeesAnnual: 175000, // $150K Shopify + $25K Apps
+    total3Year: 755000, // $230K + ($175K * 3)
     schedule: [
       { category: "Implementation (One-time)", year1: 230000, year2: 0, year3: 0, total: 230000 },
-      { category: "Platform & Apps", year1: 150000, year2: 150000, year3: 150000, total: 450000 },
+      { category: "Platform & Apps", year1: 175000, year2: 175000, year3: 175000, total: 525000 },
     ],
     operationalSavings: {
-      legacyCost: 525000,
-      projectedCost: 150000,
-      annualEfficiencyGain: 375000
+      legacyCost: 450000, // Current platform costs
+      projectedCost: 175000, // Shopify costs
+      annualEfficiencyGain: 275000 // Annual savings
     },
     costStructureShift: {
-      capex: 34,
-      opex: 66
+      capex: 30, // Implementation is ~30% of 3-year total
+      opex: 70  // Platform fees are ~70% of 3-year total
     }
   },
   currentLimitations: [
     { name: "Platform License", impact: -300000 },
-    { name: "Maintenance & Support", impact: -150000 },
-    { name: "3rd Party Integrations", impact: -75000 },
-    { name: "Total Annual Loss", impact: -525000, isTotal: true }
+    { name: "Hosting/Infrastructure", impact: -50000 },
+    { name: "Maintenance & Support", impact: -50000 },
+    { name: "3rd Party Integrations", impact: -50000 },
+    { name: "Total Annual Loss", impact: -450000, isTotal: true }
   ],
   cashFlow: {
-    maxInvestment: 280000,
-    breakevenMonth: 5,
-    year1EndingPosition: 3203333,
+    maxInvestment: 138333, // Peak negative cash flow at month 4
+    breakevenMonth: 11,
+    year1EndingPosition: 45000, // Realistic year 1 position
     monthlyData: [
-      { month: 1, net: -50000, cumulative: -50000 },
-      { month: 2, net: -80000, cumulative: -130000 },
-      { month: 3, net: -80000, cumulative: -210000 },
-      { month: 4, net: -70000, cumulative: -280000 }, // Peak investment ~280k
-      { month: 5, net: 300000, cumulative: 20000 }, // Breakeven flip
-      { month: 6, net: 416000, cumulative: 436000 },
-      { month: 7, net: 416000, cumulative: 852000 },
-      { month: 8, net: 416000, cumulative: 1268000 },
-      { month: 9, net: 416000, cumulative: 1684000 },
-      { month: 10, net: 416000, cumulative: 2100000 },
-      { month: 11, net: 416000, cumulative: 2516000 },
-      { month: 12, net: 416000, cumulative: 3203333 }, // Matches Year 1 Ending Position
+      { month: 1, net: -34583, cumulative: -34583 },
+      { month: 2, net: -34583, cumulative: -69167 },
+      { month: 3, net: -34583, cumulative: -103750 },
+      { month: 4, net: -34583, cumulative: -138333 }, // Peak investment
+      { month: 5, net: 22917, cumulative: -115417 }, // Implementation complete, savings begin
+      { month: 6, net: 22917, cumulative: -92500 },
+      { month: 7, net: 22917, cumulative: -69583 },
+      { month: 8, net: 22917, cumulative: -46667 },
+      { month: 9, net: 22917, cumulative: -23750 },
+      { month: 10, net: 22917, cumulative: -833 },
+      { month: 11, net: 22917, cumulative: 22083 }, // Breakeven!
+      { month: 12, net: 22917, cumulative: 45000 }, // Year 1 ending position
     ]
   }
 };

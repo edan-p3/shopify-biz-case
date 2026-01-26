@@ -161,6 +161,10 @@ export interface Scenario {
     platformFees: number;
     total: number;
   };
+  includesRevenueGrowth?: boolean;
+  costSavingsOnly?: number;
+  revenueGrowthBenefit?: number;
+  scenarioDescription?: string;
 }
 
 export interface CostBreakdown {
