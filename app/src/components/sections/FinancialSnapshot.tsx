@@ -5,7 +5,7 @@ import { formatCurrency } from '../../utils/formatters';
 import { InfoTooltip } from '../ui/InfoTooltip';
 
 const FinancialSnapshot: React.FC = () => {
-  const { currentScenario, selectedScenario, setScenario, inputs, includeRevenueGrowth, setIncludeRevenueGrowth, totalRevenue } = useScenario();
+  const { currentScenario, selectedScenario, setScenario, inputs, totalRevenue } = useScenario();
   
   // Check if user has entered data
   const hasData = totalRevenue > 0 || inputs.migration.implementationCost > 0;
@@ -39,41 +39,6 @@ const FinancialSnapshot: React.FC = () => {
           </p>
         </div>
 
-        {/* Revenue Growth Toggle */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 inline-flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-slate-400">Calculation Mode:</span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={includeRevenueGrowth}
-                  onChange={(e) => setIncludeRevenueGrowth(e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-            <div className="flex flex-col">
-              <span className={`text-sm font-medium transition-colors ${includeRevenueGrowth ? 'text-blue-400' : 'text-emerald-400'}`}>
-                {includeRevenueGrowth ? 'Growth Attribution' : 'Cost Savings Only'}
-              </span>
-              <span className="text-xs text-slate-500">
-                {includeRevenueGrowth 
-                  ? 'Includes platform-driven revenue growth' 
-                  : 'Conservative: operational cost reduction only'}
-              </span>
-            </div>
-            <InfoTooltip 
-              term="Mode" 
-              definition={includeRevenueGrowth 
-                ? "Growth Attribution Mode: Includes revenue growth attributed to platform capabilities (conversion improvement, mobile optimization, etc.) plus cost savings. More aggressive but requires defendable assumptions."
-                : "Cost Savings Only Mode: Conservative approach showing only verified operational cost reduction. No revenue growth attribution. Most defensible for CFO approval."
-              }
-            />
-          </div>
-        </div>
-
         {/* Scenario Toggle */}
         <div className="flex flex-col items-center mb-12 gap-3">
           <div className="bg-slate-800 p-1 rounded-xl inline-flex">
@@ -91,14 +56,9 @@ const FinancialSnapshot: React.FC = () => {
               </button>
             ))}
           </div>
-          {includeRevenueGrowth && (
-            <div className="text-center">
-              <p className="text-sm text-slate-400">{currentScenario.scenarioDescription}</p>
-              <p className="text-xs text-slate-500 mt-1">
-                *Scenarios affect revenue growth attribution when Growth Attribution mode is enabled
-              </p>
-            </div>
-          )}
+          <div className="text-center">
+            <p className="text-sm text-slate-400">{currentScenario.scenarioDescription}</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

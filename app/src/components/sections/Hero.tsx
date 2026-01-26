@@ -5,7 +5,7 @@ import { Link } from 'react-scroll';
 import { useScenario } from '../../context/ScenarioContext';
 
 const Hero: React.FC = () => {
-  const { currentScenario, inputs, includeRevenueGrowth, totalRevenue } = useScenario();
+  const { currentScenario, inputs, totalRevenue } = useScenario();
   
   // Check if user has entered data
   const hasData = totalRevenue > 0 || inputs.migration.implementationCost > 0;
@@ -61,7 +61,7 @@ const Hero: React.FC = () => {
               <>
                 A strategic investment delivering <span className="font-bold text-white">{currentScenario.roi3Year} ROI</span> in 3 years with a payback period of <span className="font-bold text-white">{currentScenario.paybackPeriod}</span>. 
                 <span className="block mt-2 text-sm text-slate-400">
-                  {includeRevenueGrowth ? '📈 Including growth attribution' : '💰 Cost savings only (conservative)'}
+                  {currentScenario.scenarioLabel} scenario projections
                 </span>
               </>
             ) : (

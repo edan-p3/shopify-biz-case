@@ -134,7 +134,7 @@ const ScenarioContext = createContext<ScenarioContextType | undefined>(undefined
 export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [inputs, setInputs] = useState<BusinessInputs>(defaultInputs);
   const [selectedScenario, setSelectedScenario] = useState<'conservative' | 'moderate' | 'aggressive'>('moderate');
-  const [includeRevenueGrowth, setIncludeRevenueGrowth] = useState<boolean>(false);
+  const includeRevenueGrowth = true; // Always include revenue growth attribution
 
   const updateInput = (section: keyof BusinessInputs, field: string, value: any) => {
     setInputs(prev => {
@@ -204,39 +204,37 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Annual Cost Savings = Current - Future
     const annualCostSavings = currentAnnualTCO - futureAnnualTCO;
 
-    // Growth Rates based on Scenario (for revenue attribution if enabled)
+    // Growth Rates based on Scenario (always applied)
     // These represent the INCREMENTAL revenue lift from platform improvements
     const scenarioRates = {
       conservative: { 
-        year1: 0.05, year2: 0.04, year3: 0.03, 
+        year1: 0.10, year2: 0.08, year3: 0.06, 
         label: "Conservative",
-        description: "5% revenue lift from conversion optimization*"
+        description: "10% revenue lift from platform improvements"
       },
       moderate: { 
-        year1: 0.10, year2: 0.08, year3: 0.06, 
+        year1: 0.15, year2: 0.12, year3: 0.10, 
         label: "Moderate",
-        description: "10% revenue lift from enhanced UX & mobile*"
+        description: "15% revenue lift from enhanced capabilities"
       },
       aggressive: { 
-        year1: 0.15, year2: 0.12, year3: 0.10, 
+        year1: 0.20, year2: 0.17, year3: 0.15, 
         label: "Aggressive",
-        description: "15% revenue lift from omnichannel optimization*"
+        description: "20% revenue lift from full optimization"
       }
     };
     
     const rates = scenarioRates[selectedScenario];
     const baselineGrowth = profile.annualGrowth;
 
-    // Revenue Projections
+    // Revenue Projections (always with platform attribution)
     const year0 = annualRevenue;
     
-    // Calculate with and without platform impact
     let year1, year2, year3;
     let revenueGainYear1 = 0, revenueGainYear2 = 0, revenueGainYear3 = 0;
     let gpGainYear1 = 0, gpGainYear2 = 0, gpGainYear3 = 0;
     
-    if (includeRevenueGrowth && annualRevenue > 0) {
-      // WITH REVENUE ATTRIBUTION
+    if (annualRevenue > 0) {
       // Calculate baseline first (organic growth)
       const baselineYear1 = year0 * (1 + baselineGrowth);
       const baselineYear2 = baselineYear1 * (1 + baselineGrowth);
@@ -262,7 +260,7 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       gpGainYear2 = revenueGainYear2 * business.grossMargin;
       gpGainYear3 = revenueGainYear3 * business.grossMargin;
     } else {
-      // WITHOUT REVENUE ATTRIBUTION (baseline only)
+      // No revenue data yet
       year1 = year0 * (1 + baselineGrowth);
       year2 = year1 * (1 + baselineGrowth);
       year3 = year2 * (1 + baselineGrowth);
@@ -357,9 +355,7 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       paybackPeriod: `${Math.max(0, paybackMonths).toFixed(1)} months`,
       roi3Year: `${roiVal.toFixed(1)}%`,
       year1Revenue: formatCurrency(year1),
-      year1RevenuePercent: includeRevenueGrowth 
-        ? `+${(rates.year1 * 100).toFixed(0)}%*`
-        : `+${(baselineGrowth * 100).toFixed(0)}%`,
+      year1RevenuePercent: `+${(rates.year1 * 100).toFixed(0)}%`,
       tcoSavings: formatCurrency(annualCostSavings),
       npv: formatCurrency(npv),
       revenueProjection: {
@@ -383,14 +379,14 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         total: totalInvestment
       },
       // Additional metadata for display
-      includesRevenueGrowth: includeRevenueGrowth,
+      includesRevenueGrowth: true,
       costSavingsOnly: annualCostSavings * 3,
       revenueGrowthBenefit: totalGrossProfitGain,
-      scenarioDescription: includeRevenueGrowth ? rates.description : "Cost savings only",
+      scenarioDescription: rates.description,
       scenarioLabel: rates.label,
       scenarioRate: rates.year1
     };
-  }, [inputs, selectedScenario, includeRevenueGrowth, totalRevenue]);
+  }, [inputs, selectedScenario, totalRevenue]);
 
   const setScenario = (name: string) => {
     if (['conservative', 'moderate', 'aggressive'].includes(name)) {
@@ -405,8 +401,8 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       currentScenario: calculatedScenario, 
       selectedScenario, 
       setScenario,
-      includeRevenueGrowth,
-      setIncludeRevenueGrowth,
+      includeRevenueGrowth: true,
+      setIncludeRevenueGrowth: () => {}, // No-op function for backwards compatibility
       totalRevenue
     }}>
       {children}

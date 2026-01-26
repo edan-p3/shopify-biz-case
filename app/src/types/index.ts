@@ -165,6 +165,8 @@ export interface Scenario {
   costSavingsOnly?: number;
   revenueGrowthBenefit?: number;
   scenarioDescription?: string;
+  scenarioLabel?: string;
+  scenarioRate?: number;
 }
 
 export interface CostBreakdown {
