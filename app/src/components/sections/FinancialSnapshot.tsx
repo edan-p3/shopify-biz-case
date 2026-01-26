@@ -5,7 +5,7 @@ import { formatCurrency } from '../../utils/formatters';
 import { InfoTooltip } from '../ui/InfoTooltip';
 
 const FinancialSnapshot: React.FC = () => {
-  const { currentScenario, selectedScenario, setScenario, inputs, totalRevenue } = useScenario();
+  const { currentScenario, inputs, totalRevenue } = useScenario();
   
   // Check if user has entered data
   const hasData = totalRevenue > 0 || inputs.migration.implementationCost > 0;
@@ -37,28 +37,6 @@ const FinancialSnapshot: React.FC = () => {
           <p className="text-slate-400 max-w-2xl mx-auto">
             Comprehensive analysis of returns, costs, and growth potential across different scenarios.
           </p>
-        </div>
-
-        {/* Scenario Toggle */}
-        <div className="flex flex-col items-center mb-12 gap-3">
-          <div className="bg-slate-800 p-1 rounded-xl inline-flex">
-            {(['conservative', 'moderate', 'aggressive'] as const).map((s) => (
-              <button
-                key={s}
-                onClick={() => setScenario(s)}
-                className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${
-                  selectedScenario === s
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
-                }`}
-              >
-                {s.charAt(0).toUpperCase() + s.slice(1)}
-              </button>
-            ))}
-          </div>
-          <div className="text-center">
-            <p className="text-sm text-slate-400">{currentScenario.scenarioDescription}</p>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

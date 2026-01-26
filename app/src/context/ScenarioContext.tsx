@@ -134,7 +134,7 @@ const ScenarioContext = createContext<ScenarioContextType | undefined>(undefined
 export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [inputs, setInputs] = useState<BusinessInputs>(defaultInputs);
   const [selectedScenario, setSelectedScenario] = useState<'conservative' | 'moderate' | 'aggressive'>('moderate');
-  const includeRevenueGrowth = true; // Always include revenue growth attribution
+  const includeRevenueGrowth = false; // Cost savings only - no revenue attribution
 
   const updateInput = (section: keyof BusinessInputs, field: string, value: any) => {
     setInputs(prev => {
@@ -180,7 +180,7 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [inputs.profile.revenueBreakdown, inputs.business.annualRevenue]);
 
   const calculatedScenario = useMemo(() => {
-    const { current, migration, business, profile } = inputs;
+    const { current, migration, profile } = inputs;
     
     // Use the calculated total revenue
     const annualRevenue = totalRevenue;
@@ -204,67 +204,39 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Annual Cost Savings = Current - Future
     const annualCostSavings = currentAnnualTCO - futureAnnualTCO;
 
-    // Growth Rates based on Scenario (always applied)
-    // These represent SMALL, REALISTIC revenue lifts from platform improvements
+    // Scenario definitions - used only for display labels
+    // All scenarios use the same calculation: COST SAVINGS ONLY
     const scenarioRates = {
       conservative: { 
-        year1: 0.02, year2: 0.015, year3: 0.01, 
+        year1: 0, year2: 0, year3: 0, 
         label: "Conservative",
-        description: "2% revenue lift from basic optimization"
+        description: "Cost savings only - no revenue attribution"
       },
       moderate: { 
-        year1: 0.05, year2: 0.04, year3: 0.03, 
+        year1: 0, year2: 0, year3: 0, 
         label: "Moderate",
-        description: "5% revenue lift from platform improvements"
+        description: "Cost savings only - no revenue attribution"
       },
       aggressive: { 
-        year1: 0.08, year2: 0.07, year3: 0.06, 
+        year1: 0, year2: 0, year3: 0, 
         label: "Aggressive",
-        description: "8% revenue lift from full optimization"
+        description: "Cost savings only - no revenue attribution"
       }
     };
     
     const rates = scenarioRates[selectedScenario];
     const baselineGrowth = profile.annualGrowth;
 
-    // Revenue Projections (always with platform attribution)
+    // Revenue Projections (baseline only - no platform attribution)
     const year0 = annualRevenue;
     
     let year1, year2, year3;
-    let revenueGainYear1 = 0, revenueGainYear2 = 0, revenueGainYear3 = 0;
     let gpGainYear1 = 0, gpGainYear2 = 0, gpGainYear3 = 0;
     
-    if (annualRevenue > 0) {
-      // Calculate baseline first (organic growth)
-      const baselineYear1 = year0 * (1 + baselineGrowth);
-      const baselineYear2 = baselineYear1 * (1 + baselineGrowth);
-      const baselineYear3 = baselineYear2 * (1 + baselineGrowth);
-      
-      // Calculate revenue lift from platform (as % of baseline)
-      const liftYear1 = baselineYear1 * rates.year1;
-      const liftYear2 = baselineYear2 * rates.year2;
-      const liftYear3 = baselineYear3 * rates.year3;
-      
-      // Total revenue = baseline + lift
-      year1 = baselineYear1 + liftYear1;
-      year2 = baselineYear2 + liftYear2;
-      year3 = baselineYear3 + liftYear3;
-      
-      // Revenue gains (just the lift portion)
-      revenueGainYear1 = liftYear1;
-      revenueGainYear2 = liftYear2;
-      revenueGainYear3 = liftYear3;
-      
-      // Gross profit from the lift
-      gpGainYear1 = revenueGainYear1 * business.grossMargin;
-      gpGainYear2 = revenueGainYear2 * business.grossMargin;
-      gpGainYear3 = revenueGainYear3 * business.grossMargin;
-    } else {
-      // No revenue data yet
-      year1 = year0 * (1 + baselineGrowth);
-      year2 = year1 * (1 + baselineGrowth);
-      year3 = year2 * (1 + baselineGrowth);
-    }
+    // Only baseline growth, no revenue attribution
+    year1 = year0 * (1 + baselineGrowth);
+    year2 = year1 * (1 + baselineGrowth);
+    year3 = year2 * (1 + baselineGrowth);
 
     // Total Annual Benefit
     const annualBenefitYear1 = annualCostSavings + gpGainYear1;
@@ -355,7 +327,7 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       paybackPeriod: `${Math.max(0, paybackMonths).toFixed(1)} months`,
       roi3Year: `${roiVal.toFixed(1)}%`,
       year1Revenue: formatCurrency(year1),
-      year1RevenuePercent: `+${(rates.year1 * 100).toFixed(0)}%`,
+      year1RevenuePercent: `+${(baselineGrowth * 100).toFixed(0)}%`,
       tcoSavings: formatCurrency(annualCostSavings),
       npv: formatCurrency(npv),
       revenueProjection: {
@@ -379,12 +351,12 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         total: totalInvestment
       },
       // Additional metadata for display
-      includesRevenueGrowth: true,
+      includesRevenueGrowth: false,
       costSavingsOnly: annualCostSavings * 3,
-      revenueGrowthBenefit: totalGrossProfitGain,
-      scenarioDescription: rates.description,
+      revenueGrowthBenefit: 0,
+      scenarioDescription: "Cost savings only - no revenue attribution",
       scenarioLabel: rates.label,
-      scenarioRate: rates.year1
+      scenarioRate: 0
     };
   }, [inputs, selectedScenario, totalRevenue]);
 
@@ -401,7 +373,7 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       currentScenario: calculatedScenario, 
       selectedScenario, 
       setScenario,
-      includeRevenueGrowth: true,
+      includeRevenueGrowth: false,
       setIncludeRevenueGrowth: () => {}, // No-op function for backwards compatibility
       totalRevenue
     }}>
