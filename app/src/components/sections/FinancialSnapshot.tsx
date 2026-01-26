@@ -75,7 +75,7 @@ const FinancialSnapshot: React.FC = () => {
         </div>
 
         {/* Scenario Toggle */}
-        <div className="flex justify-center mb-12">
+        <div className="flex flex-col items-center mb-12 gap-3">
           <div className="bg-slate-800 p-1 rounded-xl inline-flex">
             {(['conservative', 'moderate', 'aggressive'] as const).map((s) => (
               <button
@@ -91,6 +91,14 @@ const FinancialSnapshot: React.FC = () => {
               </button>
             ))}
           </div>
+          {includeRevenueGrowth && (
+            <div className="text-center">
+              <p className="text-sm text-slate-400">{currentScenario.scenarioDescription}</p>
+              <p className="text-xs text-slate-500 mt-1">
+                *Scenarios affect revenue growth attribution when Growth Attribution mode is enabled
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

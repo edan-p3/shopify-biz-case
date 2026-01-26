@@ -205,21 +205,22 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const annualCostSavings = currentAnnualTCO - futureAnnualTCO;
 
     // Growth Rates based on Scenario (for revenue attribution if enabled)
+    // These represent the INCREMENTAL revenue lift from platform improvements
     const scenarioRates = {
       conservative: { 
-        year1: 0.10, year2: 0.08, year3: 0.07, 
+        year1: 0.05, year2: 0.04, year3: 0.03, 
         label: "Conservative",
-        description: "10% incremental growth attributed to platform capabilities"
+        description: "5% revenue lift from conversion optimization*"
       },
       moderate: { 
-        year1: 0.15, year2: 0.12, year3: 0.10, 
+        year1: 0.10, year2: 0.08, year3: 0.06, 
         label: "Moderate",
-        description: "15% incremental growth from enhanced conversion & mobile experience"
+        description: "10% revenue lift from enhanced UX & mobile*"
       },
       aggressive: { 
-        year1: 0.20, year2: 0.17, year3: 0.15, 
+        year1: 0.15, year2: 0.12, year3: 0.10, 
         label: "Aggressive",
-        description: "20% growth from full omnichannel capabilities & optimization"
+        description: "15% revenue lift from omnichannel optimization*"
       }
     };
     
@@ -236,18 +237,27 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     if (includeRevenueGrowth && annualRevenue > 0) {
       // WITH REVENUE ATTRIBUTION
-      year1 = year0 * (1 + baselineGrowth + rates.year1);
-      year2 = year1 * (1 + baselineGrowth + rates.year2);
-      year3 = year2 * (1 + baselineGrowth + rates.year3);
-      
+      // Calculate baseline first (organic growth)
       const baselineYear1 = year0 * (1 + baselineGrowth);
       const baselineYear2 = baselineYear1 * (1 + baselineGrowth);
       const baselineYear3 = baselineYear2 * (1 + baselineGrowth);
       
-      revenueGainYear1 = year1 - baselineYear1;
-      revenueGainYear2 = year2 - baselineYear2;
-      revenueGainYear3 = year3 - baselineYear3;
+      // Calculate revenue lift from platform (as % of baseline)
+      const liftYear1 = baselineYear1 * rates.year1;
+      const liftYear2 = baselineYear2 * rates.year2;
+      const liftYear3 = baselineYear3 * rates.year3;
       
+      // Total revenue = baseline + lift
+      year1 = baselineYear1 + liftYear1;
+      year2 = baselineYear2 + liftYear2;
+      year3 = baselineYear3 + liftYear3;
+      
+      // Revenue gains (just the lift portion)
+      revenueGainYear1 = liftYear1;
+      revenueGainYear2 = liftYear2;
+      revenueGainYear3 = liftYear3;
+      
+      // Gross profit from the lift
       gpGainYear1 = revenueGainYear1 * business.grossMargin;
       gpGainYear2 = revenueGainYear2 * business.grossMargin;
       gpGainYear3 = revenueGainYear3 * business.grossMargin;
@@ -348,7 +358,7 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       roi3Year: `${roiVal.toFixed(1)}%`,
       year1Revenue: formatCurrency(year1),
       year1RevenuePercent: includeRevenueGrowth 
-        ? `+${((rates.year1 + baselineGrowth) * 100).toFixed(0)}%`
+        ? `+${(rates.year1 * 100).toFixed(0)}%*`
         : `+${(baselineGrowth * 100).toFixed(0)}%`,
       tcoSavings: formatCurrency(annualCostSavings),
       npv: formatCurrency(npv),
@@ -376,7 +386,9 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       includesRevenueGrowth: includeRevenueGrowth,
       costSavingsOnly: annualCostSavings * 3,
       revenueGrowthBenefit: totalGrossProfitGain,
-      scenarioDescription: includeRevenueGrowth ? rates.description : "Cost savings only"
+      scenarioDescription: includeRevenueGrowth ? rates.description : "Cost savings only",
+      scenarioLabel: rates.label,
+      scenarioRate: rates.year1
     };
   }, [inputs, selectedScenario, includeRevenueGrowth, totalRevenue]);
 
