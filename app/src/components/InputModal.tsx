@@ -77,7 +77,7 @@ function getNestedValue(obj: any, path: string) {
           <div key={key}>
             <label className="block text-xs text-slate-400 mb-1.5">{label}</label>
             <FormattedNumberInput
-              value={getNestedValue(inputs.profile, key.split('.')[1]) || 0}
+              value={getNestedValue(inputs.profile, key) || 0}
               onChange={(val) => updateInput('profile', key, val)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 pl-7 pr-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
               placeholder="0"
