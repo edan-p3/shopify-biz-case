@@ -365,10 +365,10 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         year3: year3 / 1000000
       },
       grossProfitImpact: {
-        year1: annualBenefitYear1,
-        year2: annualBenefitYear2,
-        year3: annualBenefitYear3,
-        total: totalBenefit
+        year1: gpGainYear1,
+        year2: gpGainYear2,
+        year3: gpGainYear3,
+        total: totalGrossProfitGain
       },
       netBenefit: formatCurrency(netBenefit),
       roiPercent: `${roiVal.toFixed(1)}%`,
