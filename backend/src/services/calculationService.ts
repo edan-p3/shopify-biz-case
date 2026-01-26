@@ -17,6 +17,7 @@ import {
 class CalculationService {
   /**
    * Calculate complete scenario metrics
+   * Based on ACTUAL COST SAVINGS, not revenue attribution
    */
   calculateScenarioMetrics(
     baseRevenue: number,
@@ -24,61 +25,82 @@ class CalculationService {
     implementationCost: number,
     growthRates: [number, number, number],
     discountRate: number,
-    currentPlatformCost: number,
-    operationalCosts: {
-      revenueLeakage: number;
-      operationalInefficiency: number;
-      integrationMaintenance: number;
-      manualProcessing: number;
+    currentPlatformCosts: {
+      licenseFees: number;
+      hosting: number;
+      maintenance: number;
+      thirdPartyApps: number;
+    },
+    shopifyPlatformCosts: {
+      plan: number;
+      apps: number;
     }
   ) {
-    // Calculate revenue projections
+    // Calculate current annual costs
+    const currentAnnualCosts =
+      currentPlatformCosts.licenseFees +
+      currentPlatformCosts.hosting +
+      currentPlatformCosts.maintenance +
+      currentPlatformCosts.thirdPartyApps;
+
+    // Calculate Shopify annual costs
+    const shopifyAnnualCosts = shopifyPlatformCosts.plan + shopifyPlatformCosts.apps;
+
+    // Calculate annual savings (this is the ACTUAL benefit)
+    const annualSavings = currentAnnualCosts - shopifyAnnualCosts;
+    const savingsArray = [annualSavings, annualSavings, annualSavings]; // 3 years
+
+    // Calculate total 3-year investment (implementation + 3 years of platform costs)
+    const total3YearInvestment = implementationCost + (shopifyAnnualCosts * 3);
+    
+    // Calculate total 3-year savings
+    const total3YearSavings = annualSavings * 3;
+
+    // Calculate revenue projections (for display purposes only, not for ROI)
     const revenueProjections = calculateRevenueProjection(
       baseRevenue,
       growthRates,
       3
     );
 
-    // Calculate gross profit for each year
-    const grossProfitReturns = revenueProjections
-      .slice(1) // Skip year 0
-      .map((proj) => calculateGrossProfit(proj.revenue, grossMargin));
-
-    // Update projections with gross profit
+    // Update projections with costs and savings
     revenueProjections.forEach((proj, index) => {
-      if (index > 0) {
-        proj.grossProfit = grossProfitReturns[index - 1];
+      if (index === 0) {
+        proj.costs = currentAnnualCosts;
+      } else {
+        proj.costs = shopifyAnnualCosts;
+        proj.grossProfit = annualSavings; // Annual savings
       }
     });
 
-    // Calculate costs (Shopify platform costs)
-    const shopifyPlatformCost = currentPlatformCost * 0.6; // Assume 40% reduction
-    const platformCosts = [shopifyPlatformCost, shopifyPlatformCost, shopifyPlatformCost];
-
-    // Calculate ROI metrics
+    // Calculate ROI metrics based on NET SAVINGS vs TOTAL INVESTMENT
     const roiMetrics = calculateROI(
-      grossProfitReturns,
+      savingsArray,
+      total3YearInvestment,
       implementationCost,
       discountRate
     );
 
-    // Calculate cash flow
+    // Calculate cash flow based on savings
     const cashFlowMonthly = calculateCashFlow(
-      [implementationCost],
-      platformCosts,
-      grossProfitReturns,
-      36
+      implementationCost,
+      currentAnnualCosts,
+      shopifyAnnualCosts,
+      36,
+      4 // 4 month implementation
     );
 
-    // Calculate net benefit
-    const totalReturns = grossProfitReturns.reduce((sum, val) => sum + val, 0);
-    const netBenefit = calculateNetBenefit(totalReturns, implementationCost);
+    // Calculate net benefit (total savings - total investment)
+    const netBenefit = calculateNetBenefit(total3YearSavings, total3YearInvestment);
 
     // Calculate TCO
     const tcoComparison = calculateTCO(
-      currentPlatformCost,
-      operationalCosts,
-      shopifyPlatformCost,
+      currentPlatformCosts.licenseFees,
+      currentPlatformCosts.maintenance,
+      currentPlatformCosts.thirdPartyApps,
+      currentPlatformCosts.hosting,
+      shopifyPlatformCosts.plan,
+      shopifyPlatformCosts.apps,
       implementationCost,
       3
     );
@@ -89,6 +111,11 @@ class CalculationService {
       roiMetrics,
       netBenefit,
       tcoComparison,
+      annualSavings,
+      currentAnnualCosts,
+      shopifyAnnualCosts,
+      total3YearInvestment,
+      total3YearSavings,
     };
   }
 

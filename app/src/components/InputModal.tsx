@@ -5,7 +5,7 @@ import { InfoTooltip } from './ui/InfoTooltip';
 import { useScenario } from '../context/ScenarioContext';
 import { Settings, X, ArrowRight, ArrowLeft, CheckCircle2, Building2, BarChart3, ShoppingBag, Truck, Target } from 'lucide-react';
 import { clsx } from 'clsx';
-import { FormattedNumberInput, formatNumberWithCommas } from './FormattedNumberInput';
+import { FormattedNumberInput } from './FormattedNumberInput';
 
 // Helper to safely get nested values
 function getNestedValue(obj: any, path: string) {

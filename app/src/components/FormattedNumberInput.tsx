@@ -36,8 +36,6 @@ export const FormattedNumberInput: React.FC<FormattedNumberInputProps> = ({
   placeholder = '0',
   prefix = '',
   suffix = '',
-  step = '1',
-  decimals,
 }) => {
   const [displayValue, setDisplayValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);

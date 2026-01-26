@@ -276,7 +276,6 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Payback Period
     const launchWeeks = parseInt(migration.launchTimeline) || 16;
     const implementationMonths = Math.ceil(launchWeeks / 4);
-    const monthlyBenefitYear1 = annualBenefitYear1 / 12;
     const monthlyFutureCost = futureAnnualTCO / 12;
     const monthlyImplementation = oneTimeCost / implementationMonths;
     

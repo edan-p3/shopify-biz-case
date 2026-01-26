@@ -44,24 +44,38 @@ export function calculateRevenueProjection(
 
 /**
  * Calculate ROI metrics including payback period, NPV, and IRR
+ * Based on ACTUAL COST SAVINGS, not revenue attribution
+ * 
+ * ROI Formula: ((Total Savings - Total Investment) / Total Investment) × 100
+ * This gives the percentage return on the total 3-year investment
+ * 
+ * NPV is calculated differently - implementation cost upfront, then net annual savings
  */
 export function calculateROI(
-  grossProfitReturns: number[],
+  annualSavings: number[],
   totalInvestment: number,
+  implementationCost: number,
   discountRate: number = 0.10
 ): ROIMetrics {
-  // Calculate 3-year total ROI
-  const totalReturns = grossProfitReturns.reduce((sum, val) => sum + val, 0);
-  const roi3Year = ((totalReturns - totalInvestment) / totalInvestment) * 100;
+  // Calculate 3-year total savings
+  const totalSavings = annualSavings.reduce((sum, val) => sum + val, 0);
+  
+  // Net benefit = Total savings - Total investment
+  const netBenefit = totalSavings - totalInvestment;
+  
+  // ROI = (Net Benefit / Total Investment) × 100
+  // Example: ($825k savings - $755k investment) / $755k = 9.27%
+  const roi3Year = (netBenefit / totalInvestment) * 100;
 
   // Calculate payback period (in months)
-  const paybackPeriod = calculatePaybackPeriod(grossProfitReturns, totalInvestment);
+  const paybackPeriod = calculatePaybackPeriod(annualSavings, totalInvestment);
 
-  // Calculate Net Present Value (NPV)
-  const npv = calculateNPV(grossProfitReturns, totalInvestment, discountRate);
+  // Calculate Net Present Value (NPV) - uses ONLY implementation cost as upfront
+  // Annual savings already net out the new platform costs
+  const npv = calculateNPV(annualSavings, implementationCost, discountRate);
 
   // Calculate Internal Rate of Return (IRR)
-  const irr = calculateIRR([-totalInvestment, ...grossProfitReturns]);
+  const irr = calculateIRR([-totalInvestment, ...annualSavings]);
 
   return {
     roi3Year: Math.round(roi3Year * 100) / 100,
@@ -97,21 +111,33 @@ function calculatePaybackPeriod(returns: number[], investment: number): number {
 
 /**
  * Calculate Net Present Value
+ * 
+ * CORRECT NPV APPROACH FOR PLATFORM MIGRATION:
+ * Year 0: -Implementation Cost (upfront payment)
+ * Year 1-3: Net Annual Savings (Current Costs - New Costs)
+ * 
+ * This properly reflects that:
+ * - Implementation is a one-time upfront cost
+ * - Each year, you SAVE money (old costs - new costs)
+ * - Platform fees are already subtracted in the savings calculation
  */
 function calculateNPV(
-  cashFlows: number[],
-  initialInvestment: number,
+  annualNetSavings: number[],
+  implementationCost: number,
   discountRate: number
 ): number {
-  let npv = -initialInvestment;
+  // Start with negative implementation cost (paid at Year 0)
+  let npv = -implementationCost;
 
-  cashFlows.forEach((cashFlow, index) => {
+  // Add discounted annual savings
+  annualNetSavings.forEach((saving, index) => {
     const year = index + 1;
-    npv += cashFlow / Math.pow(1 + discountRate, year);
+    npv += saving / Math.pow(1 + discountRate, year);
   });
 
   return npv;
 }
+
 
 /**
  * Calculate Internal Rate of Return using Newton-Raphson method
@@ -144,33 +170,31 @@ function calculateIRR(cashFlows: number[], guess: number = 0.1): number {
 
 /**
  * Calculate monthly cash flow for a given period
+ * Based on ACTUAL COST SAVINGS (Current costs - New costs)
  */
 export function calculateCashFlow(
-  implementationCosts: number[],
-  platformCosts: number[],
-  grossProfitReturns: number[],
-  timelineMonths: number = 36
+  implementationCost: number,
+  currentAnnualCosts: number,
+  newAnnualCosts: number,
+  timelineMonths: number = 36,
+  implementationMonths: number = 4
 ): MonthlyCashFlowData[] {
   const cashFlows: MonthlyCashFlowData[] = [];
   let cumulative = 0;
+  
+  // Calculate monthly values
+  const monthlyImplementation = implementationCost / implementationMonths;
+  const monthlySavings = (currentAnnualCosts - newAnnualCosts) / 12;
 
   for (let month = 1; month <= timelineMonths; month++) {
-    const yearIndex = Math.floor((month - 1) / 12);
-    const monthInYear = ((month - 1) % 12) + 1;
+    // Implementation costs (front-loaded in first few months)
+    const investment = month <= implementationMonths ? monthlyImplementation : 0;
 
-    // Implementation costs (typically front-loaded in first few months)
-    const investment =
-      yearIndex === 0 && month <= 6
-        ? implementationCosts[0] / 6
-        : 0;
+    // New platform costs (monthly)
+    const platformCost = newAnnualCosts / 12;
 
-    // Platform costs (monthly)
-    const platformCost = platformCosts[yearIndex] / 12;
-
-    // Returns (monthly gross profit)
-    const returns = yearIndex < grossProfitReturns.length
-      ? grossProfitReturns[yearIndex] / 12
-      : 0;
+    // Cost savings (old costs - new costs)
+    const returns = currentAnnualCosts / 12;
 
     const netCashFlow = returns - investment - platformCost;
     cumulative += netCashFlow;
@@ -190,33 +214,30 @@ export function calculateCashFlow(
 
 /**
  * Calculate Total Cost of Ownership comparison
+ * Returns actual cost savings, not revenue attribution
  */
 export function calculateTCO(
   currentPlatformCost: number,
-  currentOperationalCosts: {
-    revenueLeakage: number;
-    operationalInefficiency: number;
-    integrationMaintenance: number;
-    manualProcessing: number;
-  },
-  shopifyPlatformCost: number,
+  currentMaintenanceCost: number,
+  current3rdPartyApps: number,
+  currentHosting: number,
+  shopifyPlanCost: number,
+  shopifyAppsCost: number,
   implementationCost: number,
   years: number = 3
 ): TCOComparison {
+  // Current state total annual costs
   const currentAnnualTotal =
     currentPlatformCost +
-    currentOperationalCosts.revenueLeakage +
-    currentOperationalCosts.operationalInefficiency +
-    currentOperationalCosts.integrationMaintenance +
-    currentOperationalCosts.manualProcessing;
+    currentMaintenanceCost +
+    current3rdPartyApps +
+    currentHosting;
 
-  // Shopify reduces operational costs significantly
-  const shopifyOperationalReduction = 0.70; // 70% reduction
-  const shopifyAnnualOperational =
-    (currentOperationalCosts.operationalInefficiency +
-      currentOperationalCosts.integrationMaintenance +
-      currentOperationalCosts.manualProcessing) *
-    (1 - shopifyOperationalReduction);
+  // Shopify annual costs (plan + apps, hosting included)
+  const shopifyAnnualTotal = shopifyPlanCost + shopifyAppsCost;
+
+  // Annual savings
+  const annualSavings = currentAnnualTotal - shopifyAnnualTotal;
 
   const currentState = {
     year1: currentAnnualTotal,
@@ -226,12 +247,10 @@ export function calculateTCO(
   };
 
   const shopifyState = {
-    year1: implementationCost + shopifyPlatformCost + shopifyAnnualOperational,
-    year2: shopifyPlatformCost + shopifyAnnualOperational,
-    year3: shopifyPlatformCost + shopifyAnnualOperational,
-    total:
-      implementationCost +
-      (shopifyPlatformCost + shopifyAnnualOperational) * years,
+    year1: implementationCost + shopifyAnnualTotal,
+    year2: shopifyAnnualTotal,
+    year3: shopifyAnnualTotal,
+    total: implementationCost + (shopifyAnnualTotal * years),
   };
 
   const savings = {

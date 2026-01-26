@@ -168,9 +168,17 @@ class BusinessCaseController {
         grossMargin = 0.30,
         discountRate = 0.10,
         implementationCost = 50000,
-        currentPlatformCost,
-        operationalCosts,
+        currentPlatformCosts, // { licenseFees, hosting, maintenance, thirdPartyApps }
+        shopifyPlatformCosts, // { plan, apps }
+        operationalCosts, // For schema compatibility
       } = req.body;
+
+      // Calculate total current platform cost for schema
+      const currentPlatformCost = 
+        currentPlatformCosts.licenseFees +
+        currentPlatformCosts.hosting +
+        currentPlatformCosts.maintenance +
+        currentPlatformCosts.thirdPartyApps;
 
       // Create business case with scenarios
       const businessCase = await prisma.businessCase.create({
@@ -185,7 +193,12 @@ class BusinessCaseController {
           currentPlatformCost,
           createdById: req.user?.id,
           operationalCosts: {
-            create: operationalCosts,
+            create: operationalCosts || {
+              revenueLeakage: 0,
+              operationalInefficiency: 0,
+              integrationMaintenance: 0,
+              manualProcessing: 0,
+            },
           },
           scenarios: {
             create: ['CONSERVATIVE', 'MODERATE', 'AGGRESSIVE'].map((type) => {
@@ -202,8 +215,8 @@ class BusinessCaseController {
                 implementationCost,
                 growthRates,
                 discountRate,
-                currentPlatformCost,
-                operationalCosts
+                currentPlatformCosts,
+                shopifyPlatformCosts
               );
 
               return {

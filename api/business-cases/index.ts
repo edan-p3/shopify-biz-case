@@ -106,9 +106,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         grossMargin = 0.30,
         discountRate = 0.10,
         implementationCost = 50000,
-        currentPlatformCost,
+        currentPlatformCosts, // Detailed breakdown: { licenseFees, hosting, maintenance, thirdPartyApps }
+        shopifyPlatformCosts, // { plan, apps }
         operationalCosts,
       } = value;
+
+      // Calculate total current platform cost for schema
+      const currentPlatformCost = 
+        currentPlatformCosts.licenseFees +
+        currentPlatformCosts.hosting +
+        currentPlatformCosts.maintenance +
+        currentPlatformCosts.thirdPartyApps;
 
       const businessCase = await prisma.businessCase.create({
         data: {
@@ -121,7 +129,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           implementationCost,
           currentPlatformCost,
           operationalCosts: {
-            create: operationalCosts,
+            create: operationalCosts || {
+              revenueLeakage: 0,
+              operationalInefficiency: 0,
+              integrationMaintenance: 0,
+              manualProcessing: 0,
+            },
           },
           scenarios: {
             create: ['CONSERVATIVE', 'MODERATE', 'AGGRESSIVE'].map((type) => {
@@ -133,8 +146,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 implementationCost,
                 growthRates,
                 discountRate,
-                currentPlatformCost,
-                operationalCosts
+                currentPlatformCosts,
+                shopifyPlatformCosts
               );
 
               return {

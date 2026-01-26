@@ -6,7 +6,7 @@ import { useScenario } from '../../context/ScenarioContext';
 import { formatCurrency } from '../../utils/formatters';
 
 const GrowthProjections: React.FC = () => {
-  const { currentScenario, inputs, totalRevenue } = useScenario();
+  const { currentScenario, totalRevenue } = useScenario();
   
   // Check if user has entered data
   const hasData = totalRevenue > 0;
