@@ -205,22 +205,22 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const annualCostSavings = currentAnnualTCO - futureAnnualTCO;
 
     // Growth Rates based on Scenario (always applied)
-    // These represent the INCREMENTAL revenue lift from platform improvements
+    // These represent SMALL, REALISTIC revenue lifts from platform improvements
     const scenarioRates = {
       conservative: { 
-        year1: 0.10, year2: 0.08, year3: 0.06, 
+        year1: 0.02, year2: 0.015, year3: 0.01, 
         label: "Conservative",
-        description: "10% revenue lift from platform improvements"
+        description: "2% revenue lift from basic optimization"
       },
       moderate: { 
-        year1: 0.15, year2: 0.12, year3: 0.10, 
+        year1: 0.05, year2: 0.04, year3: 0.03, 
         label: "Moderate",
-        description: "15% revenue lift from enhanced capabilities"
+        description: "5% revenue lift from platform improvements"
       },
       aggressive: { 
-        year1: 0.20, year2: 0.17, year3: 0.15, 
+        year1: 0.08, year2: 0.07, year3: 0.06, 
         label: "Aggressive",
-        description: "20% revenue lift from full optimization"
+        description: "8% revenue lift from full optimization"
       }
     };
     
